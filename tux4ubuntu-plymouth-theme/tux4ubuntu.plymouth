@@ -4,8 +4,8 @@ Description=A theme that features the Tux himself, all dressed up for Ubuntu.
 ModuleName=script
 
 [script]
-ImageDir=/usr/share/plymouth/themes/tux4ubuntu
-ScriptFile=/usr/share/plymouth/themes/tux4ubuntu/tux4ubuntu.script
+ImageDir=/usr/share/plymouth/themes/tux4ubuntu-plymouth-theme
+ScriptFile=/usr/share/plymouth/themes/tux4ubuntu-plymouth-theme/tux4ubuntu.script
 
 [script-env-vars]
 example_env_var=example env var value

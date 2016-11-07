@@ -1,4 +1,6 @@
 #!/bin/bash
+cd "$(dirname "$0")"
+set -e
 printf "\033c"
 echo "#######################################################################################"
 echo "# TUX 4 UBUNTU POLYMOUTH THEME                                                        #" 
@@ -15,8 +17,8 @@ select yn in "Yes" "No"; do
                           read -n1 -r -p "Press any key to continue..." key
                           echo ""
                           echo "But first, Tux need your sudo allowance to add your theme to system folders:"
-                          sudo cp -r tux4ubuntu/ /usr/share/plymouth/themes/;
-                          sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/tux4ubuntu/tux4ubuntu.plymouth 100;
+                          sudo cp -r tux4ubuntu-plymouth-theme/ /usr/share/plymouth/themes/;
+                          sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/tux4ubuntu-plymouth-theme/tux4ubuntu.plymouth 100;
                           sudo update-alternatives --config default.plymouth;
                           sudo update-initramfs -u;
                           break;;
