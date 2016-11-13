@@ -47,6 +47,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             Tuxedo Joe <http://github.com/tuxedojoe>. 
             Based on the example provided with the "script plugin" written by:
             Charlie Brej   <cbrej@cs.man.ac.uk>
+            Documentation and instructions where found here: <https://wiki.ubuntu.com/Artwork/Documentation/Plymouth>
+            and here: <https://www.freedesktop.org/wiki/Software/Plymouth/Scripts/>
 
 -   TUX ILLUSTRATION by:
             Larry Ewing, at: http://isc.tamu.edu/~lewing/linux/

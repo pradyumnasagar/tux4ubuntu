@@ -8,6 +8,9 @@ echo "##########################################################################
 echo "Hi and thanks for bringing Tux to Ubuntu!"
 echo ""
 echo "Are you running Ubuntu 16.04 LTS?"
+
+# TODO: Add to search on /lib/plymouth/themes. On other systems it is /usr/share/plymouth
+
 select yn in "Yes" "No"; do
     case $yn in
         Yes ) echo "Do you understand that changing bootlogo is not without risk? Internet can help, but nothing is 100% safe.";
