@@ -1,4 +1,4 @@
-#  tux4ubuntu.script - boot splash plugin
+#  tux.script - boot splash plugin
 # 
 #  Copyright (C) 2016 The Tux4Ubuntu Initiative
 # 
@@ -31,7 +31,7 @@ Window.SetBackgroundBottomColor(0, 0, 0);
 
 if (Math.Random () == 1)
 {
-  logo.image = Image("tux4ubuntu.png");
+  logo.image = Image("tux.png");
 } else {
   logo.image = Image("00001.png");
 }
