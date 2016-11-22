@@ -1,19 +1,12 @@
 # tux-plymouth-theme
-Let's bring Tux to Ubuntu!
+Let's bring Tux to Ubuntu! v 0.8
 
-Ubuntu is nice but it needs a little Tux. Here he is, the man himself in the bootscreen, xsplash or as a Plymouth theme (whatever you would call it.
+Ubuntu is nice but it needs a little Tux. Here he is, the man himself in the bootscreen, the boot selection, in themes and much more...
 
-Written and designed by Tuxedo Joe <http://github.com/tuxedojoe> for The Tux4Ubuntu Initiative <http://tux4ubuntu.blogspot.com>. Based on the Plymouth example provided with the "script plugin" written by Charlie Brej <cbrej@cs.man.ac.uk> Original Tux illustration by Larry Ewing <http://isc.tamu.edu/~lewing/linux/>, redrawn in Inkscape by Garrett LeSage <https://github.com/garrett/Tux>.
+INSTALLATION:
+a) Visit our website for latest version and written install instructions: 
+    http://tux4ubuntu.blogspot.com (for Ubuntu) and http://tux4linux.blogspot.com (for other distros)
 
-Either run the install.sh script (write "./install.sh" when in this folder using the terminal), or just type the following commands:
+b) Or just type (./install.sh in this folder using a terminal, which you open by pressing Ctrl-Alt-t in Ubuntu)
 
-      Copy the theme (earlier Ubuntu versions had the themes in /lib/plymouth/themes/)
-          1) sudo cp -r tux/ /usr/share/plymouth/themes/
-      Add the theme to Plymouth (remember to change the folder adresses if needed)
-          2) sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/tux/tux.plymouth 100
-      Change the default theme, follow the instructions
-          3) sudo update-alternatives --config default.plymouth
-      Update initramfs"
-          4) sudo update-initramfs -update
-
-Let us know what you think!
+Please, let us know what you think and spread the word!
