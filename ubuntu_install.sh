@@ -25,6 +25,7 @@ select yn in "Yes" "No"; do
                           sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth 100;
                           sudo update-alternatives --config default.plymouth;
                           sudo update-initramfs -u;
+                          x-www-browser http://tux4ubuntu.blogspot.se/2016/11/done.html;
                           break;;
                     No ) exit;;
                     esac

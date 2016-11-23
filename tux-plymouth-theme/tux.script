@@ -38,20 +38,20 @@ if (Plymouth.GetMode () == "shutdown")
       if (a <= 0.125)
         if (a <= 0.0625)
           if (a <= 0.03125)
-            logo.image = Image(".cache/00001");
+            logo.image = Image("cache/00001");
           else
-            logo.image = Image(".cache/10000");
+            logo.image = Image("cache/10000");
         else
-          logo.image = Image(".cache/00010");
+          logo.image = Image("cache/00010");
 
       else
-        logo.image = Image(".cache/00100");
+        logo.image = Image("cache/00100");
 
     else
-      logo.image = Image(".cache/01000");
+      logo.image = Image("cache/01000");
   
   else
-    logo.image = Image(".cache/10000");
+    logo.image = Image("cache/10000");
 }
 
 
