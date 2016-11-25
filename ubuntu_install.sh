@@ -22,27 +22,35 @@ select yn in "Yes" "No"; do
                           echo ""
                           echo "But first, Tux need your sudo allowance to add your theme to system folders:"
                           
+                          # Workaround Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
+                          # so instead of simply sudo cp -r tux-plymouth-theme/ /usr/share/plymouth/themes/tux-plymouth-theme we have to (6 steps):
+
+                          # 1) Add other themes through the apt-get package 'plymouth-themes' that seem to work
                           PKG_INSTALLED=$(dpkg-query -W --showformat='${Status}\n' plymouth-themes|grep "install ok installed")
                           echo Checking if plymouth-themes is installed: $PKG_INSTALLED
                           if [ "" == "$PKG_INSTALLED" ]; then
                             echo "plymouth-themes is not installed. Installing now."
                             sudo apt-get --force-yes --yes install plymouth-themes
                           fi
-                          
-                          # Workaround Ubuntu Plymouth bug that doesn't allow copied plymouth themes
+                          # 2) Copy one of these themes
                           sudo cp -r /usr/share/plymouth/themes/script /usr/share/plymouth/themes/tux-plymouth-theme;  
+                          # 3) Add tux-plymouth-theme files
                           sudo cp -r tux-plymouth-theme/* /usr/share/plymouth/themes/tux-plymouth-theme;
+                          # 4) Copy the internals of our files to existing
                           sudo cat /usr/share/plymouth/themes/tux-plymouth-theme/tux.script >> /usr/share/plymouth/themes/tux-plymouth-theme/script.script
                           sudo cat /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth >> /usr/share/plymouth/themes/tux-plymouth-theme/script.plymouth
+                          # 5) Remove our own files
                           sudo rm /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth;
                           sudo rm /usr/share/plymouth/themes/tux-plymouth-theme/tux.script;
+                          # 6) And rename the newly created copies
                           sudo mv /usr/share/plymouth/themes/tux-plymouth-theme/script.script /usr/share/plymouth/themes/tux-plymouth-theme/tux.script
                           sudo mv /usr/share/plymouth/themes/tux-plymouth-theme/script.plymouth /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth
 
-
+                          # Then we can add it to default.plymouth and update update-initramfs accordingly
                           sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth 100;
                           sudo update-alternatives --config default.plymouth;
                           sudo update-initramfs -u;
+
                           x-www-browser http://tux4ubuntu.blogspot.se/2016/11/done.html;
                           break;;
                     No ) exit;;
