@@ -2,35 +2,44 @@
 cd "$(dirname "$0")"
 set -e
 printf "\033c"
-echo "################################################################################"
-echo "# TUX                                                           #" 
-echo "################################################################################"
-echo "Hi and thanks for bringing Tux to Ubuntu!"
 
 # TODO: Add to search on /lib/plymouth/themes. On other systems it is /usr/share/plymouth
 #       More info on other OSes: http://brej.org/blog/?p=158
 
 # Menu system as found here: http://stackoverflow.com/questions/20224862/bash-script-always-show-menu-after-loop-execution
+# Tux as ASCII found here: http://www.chris.com/ascii/index.php?art=logos%20and%20insignias/linux
+
 while :
 do
     clear
     cat<<EOF
-    ==============================
-    Menusystem experiment
-    ------------------------------
-    Please enter your choice:
-
-    Option (1)
-    Option (2)
-    Option (3)
-           (Q)uit
-    ------------------------------
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Tux4Ubuntu - Let's bring Tux to Ubuntu          © 2016 Tux4Ubuntu Initiative ║
+║ http://tux4ubuntu.blogspot.com                                               ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║                                                                              ║
+║   Where do you want Tux?                                                     ║
+║                                                                              ║
+║   1) Everywhere                                - Installs all of the below   ║
+║   ------------------------------------------------------------------------   ║
+║   2) Boot Loader                               - Installs rEFInd theme       ║
+║   3) Boot logos                                - Installs Plymouth theme     ║
+║   4) Login Screen                              - Updates icons and colors    ║
+║   5) Desktop theme & icons                     - Specialized unity theme     ║
+║   6) Wallpapers                                - Adds Tux favourite images   ║
+║   7) Games                                     - Installs games feat. Tux    ║
+║   8) On my belly!                              - Buy the t-shirt             ║
+║   ------------------------------------------------------------------------   ║
+║   Q) I'm done                                  - Quits installer             ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 EOF
     read -n1 -s
     case "$REPLY" in
     "1")  echo "you chose choice 1" ;;
     "2")  echo "you chose choice 2" ;;
 
+        
 
 
     "3")  echo "you chose choice 3" ;
@@ -43,8 +52,11 @@ EOF
                         echo "hold responsible if you proceed. Internet can help, but nothing is 100% safe.";
                         select yn in "Yes" "No"; do
                             case $yn in
-                                Yes ) echo "Ok, here we go!"
-                                    echo "PS. Tux needs to use apt-get packages 'plymouth-theme' and 'xclip', if not installed you will be asked to install them. And sudo rights will also be asked for so Tux can copy the theme to your plymouth folder."
+                                Yes ) printf "\033c"
+                                    echo "Ok, here we go!"
+                                    echo "PS. Tux needs to use apt-get packages 'plymouth-theme' and 'xclip', if not" 
+                                    echo "installed you will be asked to install them. And sudo rights will also be asked" 
+                                    echo "for so Tux can copy the theme to your plymouth folder."
                                     read -n1 -r -p "Press any key to continue..." key
 
                                     # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
