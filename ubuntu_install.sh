@@ -6,29 +6,41 @@ echo "##########################################################################
 echo "# TUX                                                           #" 
 echo "################################################################################"
 echo "Hi and thanks for bringing Tux to Ubuntu!"
-echo ""
-echo "Select where you want Tux:"
 
 # TODO: Add to search on /lib/plymouth/themes. On other systems it is /usr/share/plymouth
 #       More info on other OSes: http://brej.org/blog/?p=158
 
-PS3='Please enter your choice: '
-options=("Everywhere (will install all of the following)" "Boot loader (rEFInd theme)" "Boot logo (Plymouth theme)" "Quit")
-select opt in "${options[@]}"
+# Menu system as found here: http://stackoverflow.com/questions/20224862/bash-script-always-show-menu-after-loop-execution
+while :
 do
-    case $opt in
-        "Everywhere (will install all of the following)")
-            echo "you chose choice 1"
-            ;;
-        "Boot loader (rEFInd theme)")
+    clear
+    cat<<EOF
+    ==============================
+    Menusystem experiment
+    ------------------------------
+    Please enter your choice:
 
-            ;;
-        "Boot logo (Plymouth theme)")
-            echo "Are you sure you want to install Tux Plymouth Theme?"
+    Option (1)
+    Option (2)
+    Option (3)
+           (Q)uit
+    ------------------------------
+EOF
+    read -n1 -s
+    case "$REPLY" in
+    "1")  echo "you chose choice 1" ;;
+    "2")  echo "you chose choice 2" ;;
 
+
+
+    "3")  echo "you chose choice 3" ;
+            printf "\033c"
+            echo "Are you running Ubuntu 16.04?"
             select yn in "Yes" "No"; do
                 case $yn in
-                    Yes ) echo "Do you understand that changing bootlogo is not without risk? Internet can help, but nothing is 100% safe.";
+                    Yes ) printf "\033c"
+                        echo "Do you understand that changing bootlogo is not without risk? And we can't be ";
+                        echo "hold responsible if you proceed. Internet can help, but nothing is 100% safe.";
                         select yn in "Yes" "No"; do
                             case $yn in
                                 Yes ) echo "Ok, here we go!"
@@ -92,32 +104,23 @@ do
 
 
                                     break;;
-                                No ) exit;;
+                                No ) printf "\033c"
+                                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
+                                    exit;;
                                 esac
                             done
                         break;;
-                    No )  echo "Can't guarantee anything but just typing these commands and following instructions should do it:"
-                        echo ""
-                        echo "      Copy the theme (earlier Ubuntu versions had the themes in /lib/plymouth/themes/)"
-                        echo "          1) sudo cp -r tux/ /usr/share/plymouth/themes/"
-                        echo "      Add the theme to Plymouth (remember to change the folder adresses if needed)"
-                        echo "          2) sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/tux/tux.plymouth 100"
-                        echo "      Change the default theme, follow the instructions"
-                        echo "          3) sudo update-alternatives --config default.plymouth"
-                        echo "      Update initramfs"
-                        echo "          4) sudo update-initramfs -u"
-                        echo ""
-                        echo "Good luck!"
+                    No )  printf "\033c"
+                        echo "We're working on adding support for other Linux distributions and Ubuntu versions. So hang tight. Or edit this .sh file and give it a try. Let us know what happens! Tux will be happy for your contributions."
                         exit;;
                 esac
             done
+            ;;
 
-            ;;
-        "Quit")
-            break
-            ;;
-        *) echo invalid option;;
+    "Q")  exit                      ;;
+    "q")  echo "case sensitive!!"   ;; 
+     * )  echo "invalid option"     ;;
     esac
+    sleep 1
 done
-
 x-www-browser http://tux4ubuntu.blogspot.se/2016/11/done.html;
