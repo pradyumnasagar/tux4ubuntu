@@ -25,6 +25,7 @@ select yn in "Yes" "No"; do
                           # Workaround Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
                           # so instead of simply sudo cp -r tux-plymouth-theme/ /usr/share/plymouth/themes/tux-plymouth-theme we have to (6 steps):
 
+
                           # 1) Add other themes through the apt-get package 'plymouth-themes' that seem to work
                           PKG_INSTALLED=$(dpkg-query -W --showformat='${Status}\n' plymouth-themes|grep "install ok installed")
                           echo Checking if plymouth-themes is installed: $PKG_INSTALLED
@@ -37,8 +38,20 @@ select yn in "Yes" "No"; do
                           # 3) Add tux-plymouth-theme files
                           sudo cp -r tux-plymouth-theme/* /usr/share/plymouth/themes/tux-plymouth-theme;
                           # 4) Copy the internals of our files to existing
-                          sudo cat /usr/share/plymouth/themes/tux-plymouth-theme/tux.script >> /usr/share/plymouth/themes/tux-plymouth-theme/script.script
-                          sudo cat /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth >> /usr/share/plymouth/themes/tux-plymouth-theme/script.plymouth
+                          # 4a) Add other themes through the apt-get package 'plymouth-themes' that seem to work
+                          PKG_INSTALLED=$(dpkg-query -W --showformat='${Status}\n' xclip|grep "install ok installed")
+                          echo Checking if xclip is installed: $PKG_INSTALLED
+                          if [ "" == "$PKG_INSTALLED" ]; then
+                            echo "xclip is not installed. Installing now."
+                            sudo apt-get --force-yes --yes install xclip
+                          fi
+                          # 4b Copy and paste using xclip
+                          xclip /usr/share/plymouth/themes/tux-plymouth-theme/tux.script;
+                          sudo bash -c '> /usr/share/plymouth/themes/tux-plymouth-theme/script.script';
+                          xclip -out | sudo tee -a /usr/share/plymouth/themes/tux-plymouth-theme/script.script;
+                          xclip /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth;
+                          sudo bash -c '> /usr/share/plymouth/themes/tux-plymouth-theme/script.plymouth';
+                          xclip -out | sudo tee -a /usr/share/plymouth/themes/tux-plymouth-theme/script.plymouth;                          
                           # 5) Remove our own files
                           sudo rm /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth;
                           sudo rm /usr/share/plymouth/themes/tux-plymouth-theme/tux.script;
