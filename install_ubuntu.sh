@@ -12,27 +12,27 @@ set -e
 while :
 do
     clear
-    cat<<EOF
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Tux4Ubuntu - Let's bring Tux to Ubuntu          © 2016 Tux4Ubuntu Initiative ║
-║ http://tux4ubuntu.blogspot.com                                               ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║                                                                              ║
-║   Where do you want Tux?                                                     ║
-║                                                                              ║
-║   1) Everywhere                                - Installs all of the below   ║
-║   ------------------------------------------------------------------------   ║
-║   2) Boot Loader                               - Installs rEFInd theme       ║
-║   3) Boot Logo                                 - Installs Plymouth theme     ║
-║   4) Login Screen                              - Updates icons and colors    ║
-║   5) Desktop Theme & Icons                     - Specialized Arch-theme      ║
-║   6) Wallpapers                                - Adds Tux favourite images   ║
-║   7) Games                                     - Installs games feat. Tux    ║
-║   8) On my belly!                              - Buy the t-shirt             ║
-║   ------------------------------------------------------------------------   ║
-║   Q) I'm done                                  - Quits installer             ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+    cat<<EOF    
+╔═════════════════════════════════════════════════════════════════════════════════╗
+║ TUX 4 UBUNTU                                       © 2016 Tux4Ubuntu Initiative ║
+║ Let's bring Tux to Ubuntu                        http://tux4ubuntu.blogspot.com ║
+╠═════════════════════════════════════════════════════════════════════════════════╣
+║                                                                                 ║
+║   Where do you want Tux?                                                        ║
+║                                                                                 ║
+║   1) Everywhere                                   - Installs all of the below   ║
+║   ---------------------------------------------------------------------------   ║
+║   2) Boot Loader                                  - Installs rEFInd theme       ║
+║   3) Boot Logo                                    - Installs Plymouth theme     ║
+║   4) Login Screen                                 - Updates icons and colors    ║
+║   5) Desktop Theme & Icons                        - Specialized Arch-theme      ║
+║   6) Wallpapers                                   - Adds Tux favourite images   ║
+║   7) Games                                        - Installs games feat. Tux    ║
+║   8) On my belly!                                 - Buy the t-shirt             ║
+║   ---------------------------------------------------------------------------   ║
+║   Q) I'm done                                     - Quits installer             ║
+║                                                                                 ║
+╚═════════════════════════════════════════════════════════════════════════════════╝
 EOF
     read -n1 -s
     case "$REPLY" in
