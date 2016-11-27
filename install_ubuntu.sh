@@ -13,32 +13,42 @@ while :
 do
     clear
     cat<<EOF    
-╔═════════════════════════════════════════════════════════════════════════════════╗
-║ TUX 4 UBUNTU                                       © 2016 Tux4Ubuntu Initiative ║
-║ Let's bring Tux to Ubuntu                        http://tux4ubuntu.blogspot.com ║
-╠═════════════════════════════════════════════════════════════════════════════════╣
-║                                                                                 ║
-║   Where do you want Tux?                                                        ║
-║                                                                                 ║
-║   1) Everywhere                                   - Install all of the below    ║
-║   ---------------------------------------------------------------------------   ║
-║   2) Boot Loader                                  - Install rEFInd theme        ║
-║   3) Boot Logo                                    - Install Plymouth theme      ║
-║   4) Login Screen                                 - Update icons and colors     ║
-║   5) Desktop Theme & Icons                        - Specialized Arch-theme      ║
-║   6) Wallpapers                                   - Adds Tux favourite images   ║
-║   7) Games                                        - Install games feat. Tux     ║
-║   8) On my belly!                                 - Buy the t-shirt             ║
-║   ---------------------------------------------------------------------------   ║
-║   Q) I'm done                                     - Quits installer             ║
-║                                                                                 ║
-╚═════════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ TUX 4 UBUNTU                                    © 2016 Tux4Ubuntu Initiative ║
+║ Let's bring Tux to Ubuntu                     http://tux4ubuntu.blogspot.com ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║                                                                              ║
+║   Where do you want Tux?                                                     ║
+║                                                                              ║
+║   1) Everywhere                                - Install all of the below    ║
+║   ------------------------------------------------------------------------   ║
+║   2) Boot Loader                               - Install rEFInd theme        ║
+║   3) Boot Logo                                 - Install Plymouth theme      ║
+║   4) Login Screen                              - Update icons and colors     ║
+║   5) Desktop Theme & Icons                     - Specialized Arch-theme      ║
+║   6) Wallpapers                                - Adds Tux favourite images   ║
+║   7) Games                                     - Install games feat. Tux     ║
+║   8) On my belly!                              - Buy the t-shirt             ║
+║   ------------------------------------------------------------------------   ║
+║   Q) I'm done                                  - Quits installer             ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 EOF
     read -n1 -s
     case "$REPLY" in
     "1")    echo "you chose choice 1" ;;
     "2")    # Boot Loader
-            echo "Do you understand that changing bootloader is not without risk? And we can't be ";
+            printf "\033c"
+            echo "Do you understand that changing boot loader theme (and potentially the boot"
+            echo "loader as well) is not without risk? And we can't be hold responsible if"  
+            echo "you proceed. Our website and internet can help but nothing is 100% safe."
+            if sudo -n true 2>/dev/null; then 
+                :
+            else
+                echo ""
+                echo "Oh, and Tux need sudo rights to copy and install everything, so we'll ask about that soon."
+            fi
+            echo "(Type 1 or 2, then press ENTER)"
             select yn in "Yes" "No"; do
             case $yn in
                 Yes ) printf "\033c"
@@ -50,6 +60,7 @@ EOF
                             # The rEFInd ppa is not registered. Ask if user wants it installed.
                             echo "Your system is new enough to boot using EFI, but you're not running the more graphical"
                             echo "bootloader rEFInd. Would you like to install it? (If're not dual-booting, skip this step)"
+                            echo "(Type 1 or 2, then press ENTER)"
                             select yn in "Yes" "No"; do
                             case $yn in
                                 Yes ) printf "\033c"
@@ -101,11 +112,14 @@ EOF
     "3")    # Boot Logo
             printf "\033c"
             echo "Are you running Ubuntu 16.04?"
+            echo "(Type 1 or 2, then press ENTER)"
             select yn in "Yes" "No"; do
                 case $yn in
                     Yes ) printf "\033c"
-                        echo "Do you understand that changing bootlogo is not without risk? And we can't be ";
-                        echo "hold responsible if you proceed. Internet can help, but nothing is 100% safe.";
+                        echo "Do you understand that changing boot loader theme (and potentially the boot"
+                        echo "loader as well) is not without risk? And we can't be hold responsible if"  
+                        echo "you proceed. Our website and internet can help but nothing is 100% safe."
+                        echo "(Type 1 or 2, then press ENTER)"
                         select yn in "Yes" "No"; do
                             case $yn in
                                 Yes ) printf "\033c"
