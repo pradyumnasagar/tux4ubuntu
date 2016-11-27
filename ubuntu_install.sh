@@ -96,7 +96,7 @@ EOF
                         echo "Starting to copy rEFInd theme."
                         sudo mkdir -p /boot/efi/EFI/refind/themes
                         sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
-                        echo 'include /themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf                        
+                        echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf                        
 
                     else 
                         echo "BIOS boot noticed. ";
