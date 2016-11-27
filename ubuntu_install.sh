@@ -25,7 +25,7 @@ do
 ║   2) Boot Loader                               - Installs rEFInd theme       ║
 ║   3) Boot Logo                                 - Installs Plymouth theme     ║
 ║   4) Login Screen                              - Updates icons and colors    ║
-║   5) Desktop theme & icons                     - Specialized unity theme     ║
+║   5) Desktop Theme & Icons                     - Specialized Arch-theme      ║
 ║   6) Wallpapers                                - Adds Tux favourite images   ║
 ║   7) Games                                     - Installs games feat. Tux    ║
 ║   8) On my belly!                              - Buy the t-shirt             ║
@@ -62,8 +62,25 @@ EOF
                             select yn in "Yes" "No"; do
                             case $yn in
                                 Yes ) #printf "\033c"
+                            # Commands to add the ppa ...
+                                    sudo apt-add-repository ppa:rodsmith/refind
+                                    sudo apt-get update
+                                    MISC="refind"
 
-                                    echo "test";
+                                    for pkg in $MISC; do
+                                        if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
+                                            echo -e "$pkg is already installed"
+                                        else
+
+                                            if sudo apt-get -qq install $pkg; then
+                                                echo "Successfully installed $pkg"
+                                            else
+                                                echo "Error installing $pkg"
+                                            fi        
+                                        fi
+                                    done
+
+                                    echo "Done";
 
                                     break;;
                                 No ) #printf "\033c"
@@ -72,30 +89,14 @@ EOF
                                 esac
                             done
 
-                            # Commands to add the ppa ...
-                            sudo apt-add-repository ppa:rodsmith/refind
-                            sudo apt-get update
-                            MISC="refind"
-
-                            for pkg in $MISC; do
-                                if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
-                                    echo -e "$pkg is already installed"
-                                else
-
-                                    if sudo apt-get -qq install $pkg; then
-                                        echo "Successfully installed $pkg"
-                                    else
-                                        echo "Error installing $pkg"
-                                    fi        
-                                fi
-                            done
                         else
                             #printf "\033c"
                             echo "Seems like you have rEFInd installed."
                         fi
-                            echo "Starting to copy rEFInd theme."
-                            sudo mkdir -p /boot/efi/EFI/refind/themes
-                            sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
+                        echo "Starting to copy rEFInd theme."
+                        sudo mkdir -p /boot/efi/EFI/refind/themes
+                        sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
+                        echo 'include /themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf                        
 
                     else 
                         echo "BIOS boot noticed. ";
