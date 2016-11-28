@@ -48,6 +48,7 @@ EOF
                 echo ""
                 echo "Oh, and Tux need sudo rights to copy and install everything, so we'll ask about that soon."
             fi
+            echo ""
             echo "(Type 1 or 2, then press ENTER)"
             select yn in "Yes" "No"; do
             case $yn in
@@ -60,6 +61,7 @@ EOF
                             # The rEFInd ppa is not registered. Ask if user wants it installed.
                             echo "Your system is new enough to boot using EFI, but you're not running the more graphical"
                             echo "bootloader rEFInd. Would you like to install it? (If're not dual-booting, skip this step)"
+                            echo ""
                             echo "(Type 1 or 2, then press ENTER)"
                             select yn in "Yes" "No"; do
                             case $yn in
@@ -84,7 +86,7 @@ EOF
                                     echo "Done";
                                     break;;
                                 No ) printf "\033c"
-                                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
+                                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
                                     exit;;
                                 esac
                             done
@@ -94,7 +96,7 @@ EOF
                             echo "Seems like you have rEFInd installed."
                         fi
                         printf "\033c"
-                        echo "Copying folder tux-refind-theme."
+                        echo "Initiating to copy folder tux-refind-theme."
                         sudo mkdir -p /boot/efi/EFI/refind/themes
                         sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
                         echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf                        
@@ -102,23 +104,28 @@ EOF
                         echo "BIOS boot noticed. ";
                     fi
                     echo "Boot Loader theme installed successfully!"
+                    echo ""
                     read -n1 -r -p "Press any key to continue..." key
                     break;;
                 No ) printf "\033c"
                     echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
-                    exit;;
+                    echo ""
+                    read -n1 -r -p "Press any key to continue..." key
+                    break;;
                 esac
             done ;;
     "3")    # Boot Logo
             printf "\033c"
             echo "Are you running Ubuntu 16.04?"
-            echo "(Type 1 or 2, then press ENTER)"
+            echo ""
+            echo "(Type 1 or 2, then press ENTER)"            
             select yn in "Yes" "No"; do
                 case $yn in
                     Yes ) printf "\033c"
                         echo "Do you understand that changing boot loader theme (and potentially the boot"
                         echo "loader as well) is not without risk? And we can't be hold responsible if"  
                         echo "you proceed. Our website and internet can help but nothing is 100% safe."
+                        echo ""
                         echo "(Type 1 or 2, then press ENTER)"
                         select yn in "Yes" "No"; do
                             case $yn in
@@ -127,6 +134,7 @@ EOF
                                     echo "PS. Tux needs to use apt-get packages 'plymouth-theme' and 'xclip', if not" 
                                     echo "installed you will be asked to install them. And sudo rights will also be asked" 
                                     echo "for, so that Tux can copy the theme to your plymouth folder."
+                                    echo ""
                                     read -n1 -r -p "Press any key to continue..." key
 
                                     # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
@@ -187,20 +195,26 @@ EOF
 
                                     break;;
                                 No ) printf "\033c"
-                                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
-                                    exit;;
+                                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
+                                    echo ""
+                                    read -n1 -r -p "Press any key to continue..." key
+                                    break;;
                                 esac
                             done
                         break;;
                     No )  printf "\033c"
-                        echo "We're working on adding support for other Linux distributions and Ubuntu versions. So hang tight. Or edit this .sh file and give it a try. Let us know what happens! Tux will be happy for your contributions."
-                        exit;;
+                        echo "We're working on adding support for other Linux distributions and Ubuntu"
+                        echo "versions. So hang tight. Or edit this .sh file and give it a try. "
+                        echo "Let us know if it works or doesn't! Tux will be happy for your contributions."
+                        echo ""
+                        read -n1 -r -p "Press any key to continue..." key
+                        break;;
                 esac
             done
             ;;
-
+    "4")    echo "you chose choice 1" ;;
     "Q")    exit                      ;;
-    "q")    echo "case sensitive!!"   ;; 
+    "q")    exit                      ;; 
      * )    echo "invalid option"     ;;
     esac
     sleep 1
