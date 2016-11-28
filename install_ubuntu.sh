@@ -30,6 +30,8 @@ do
 ║   7) Games                                     - Install games feat. Tux     ║
 ║   8) On my belly!                              - Buy the t-shirt             ║
 ║   ------------------------------------------------------------------------   ║
+║   9) Uninstall Tux                             - Uninstall the above         ║
+║   ------------------------------------------------------------------------   ║
 ║   Q) I'm done                                  - Quits installer             ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
@@ -212,7 +214,11 @@ EOF
                 esac
             done
             ;;
-    "4")    echo "you chose choice 1" ;;
+    "4")    sudo gsettings set com.canonical.unity-greeter background-color “#000000”
+            sudo gsettings set com.canonical.unity-greeter draw-grid false
+            sudo cp tux-login-theme/cof_tux.png /usr/share/unity-greeter/
+            sudo gsettings set com.canonical.unity-greeter background-logo /usr/share/unity-greeter/cof_tux.png
+            echo "you chose choice 1" ;;
     "Q")    exit                      ;;
     "q")    exit                      ;; 
      * )    echo "invalid option"     ;;
