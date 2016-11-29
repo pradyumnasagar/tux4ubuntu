@@ -269,8 +269,15 @@ EOF
             wget http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
             sudo apt-key add - < Release.key
             sudo apt-get install unity-tweak-tool
-            wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install-papirus-home-gtk.sh | sh
-            
+            #wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install-papirus-home-gtk.sh | sh
+
+            # Install paper-icon-theme
+            sudo add-apt-repository ppa:snwh/pulp
+            sudo apt-get update
+            sudo apt-get install paper-icon-theme
+            sudo apt-get install paper-gtk-theme
+            sudo apt-get install paper-cursor-theme
+
 
             printf "\033c"
             echo "Successfully tuxedoed up your Unity Theme."
