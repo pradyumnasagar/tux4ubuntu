@@ -214,13 +214,26 @@ EOF
                 esac
             done
             ;;
-    "4")    sudo gsettings set com.canonical.unity-greeter background-color “#000000”
-            sudo gsettings set com.canonical.unity-greeter draw-grid false
+    "4")    
+            # Copying Tux icon before adding it
             sudo cp tux-login-theme/cof_tux.png /usr/share/unity-greeter/
-            sudo gsettings set com.canonical.unity-greeter background-logo /usr/share/unity-greeter/cof_tux.png
+            sudo cp tux-login-theme/tux-login-gsettings.sh /tmp
+            sudo chmod 0755 /tmp/tux-login-gsettings.sh
+
+            # Need to do it as su, otherwise changes don't take effect
+            sudo bash tux-login-theme/tux-login-script.sh 
+
+            sudo rm /tmp/tux-login-gsettings.sh
+            #sudo -i
+            #xhost +SI:localuser:lightdm
+            #su lightdm -s /bin/bash
+            #gsettings set com.canonical.unity-greeter background-color “#000000”
+            #gsettings set com.canonical.unity-greeter draw-grid false
+            #gsettings set com.canonical.unity-greeter background-logo /usr/share/unity-greeter/cof_tux.png
+
             echo "you chose choice 1" ;;
     "Q")    exit                      ;;
-    "q")    exit                      ;; 
+    "q")    exit                      ;;
      * )    echo "invalid option"     ;;
     esac
     sleep 1
