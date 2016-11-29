@@ -1,9 +1,9 @@
 #!/bin/bash
-echo hi
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
+  then echo "Please run as root."
   exit
 fi
-echo "$USER"
+# Can uncomment below to make sure we are running as lightdm
+# echo "$USER"
 xhost +SI:localuser:lightdm
 su lightdm -s /tmp/tux-login-gsettings.sh

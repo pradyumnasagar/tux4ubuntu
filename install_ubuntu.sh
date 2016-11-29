@@ -215,23 +215,30 @@ EOF
             done
             ;;
     "4")    
+            printf "\033c"
+            echo "Starting to copy files and changing dconf settings."
+            if sudo -n true 2>/dev/null; then 
+                :
+            else
+                echo ""
+                echo "Tux will need your sudo rights to copy and install everything."
+            fi
+            echo ""
             # Copying Tux icon before adding it
             sudo cp tux-login-theme/cof_tux.png /usr/share/unity-greeter/
+            # Copying that needs to be run as su, and then lightdm. Put it in tmp for easier access
             sudo cp tux-login-theme/tux-login-gsettings.sh /tmp
+            # Make it executable by all so that lightdm can run it
             sudo chmod 0755 /tmp/tux-login-gsettings.sh
-
             # Need to do it as su, otherwise changes don't take effect
             sudo bash tux-login-theme/tux-login-script.sh 
-
+            # Now we can remove the script from tmp
             sudo rm /tmp/tux-login-gsettings.sh
-            #sudo -i
-            #xhost +SI:localuser:lightdm
-            #su lightdm -s /bin/bash
-            #gsettings set com.canonical.unity-greeter background-color “#000000”
-            #gsettings set com.canonical.unity-greeter draw-grid false
-            #gsettings set com.canonical.unity-greeter background-logo /usr/share/unity-greeter/cof_tux.png
-
-            echo "you chose choice 1" ;;
+            printf "\033c"
+            echo "Successfully installed Login Theme."
+            echo ""
+            read -n1 -r -p "Press any key to continue..." key
+            ;;
     "Q")    exit                      ;;
     "q")    exit                      ;;
      * )    echo "invalid option"     ;;
