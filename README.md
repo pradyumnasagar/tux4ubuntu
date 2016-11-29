@@ -1,4 +1,4 @@
-# Let's bring Tux to Ubuntu! v 0.8
+# Let's bring Tux to Ubuntu!
 Ubuntu is nice but it needs a little Tux. Here he is, the man himself in the bootscreen, the boot selection, in themes and much more...
 
 INSTALLATION:
