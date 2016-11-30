@@ -94,8 +94,8 @@ do
 ║   ------------------------------------------------------------------------   ║
 ║   2) Boot Loader                               - Install rEFInd theme        ║
 ║   3) Boot Logo                                 - Install Plymouth theme      ║
-║   4) Login Screen                              - Update icons and colors     ║
-║   5) Desktop Theme & Icons                     - Specialized Arch-theme      ║
+║   4) Login Screen                              - Remove grid and wallpaper   ║
+║   5) Desktop Theme/Icons/Fonts + Tux           - Some class to your desktop  ║
 ║   6) Wallpapers                                - Adds Tux favourite images   ║
 ║   7) Games                                     - Install games feat. Tux     ║
 ║   8) On my belly!                              - Buy the t-shirt             ║
@@ -111,6 +111,8 @@ EOF
     "1")    echo "you chose choice 1" ;;
     "2")    # Boot Loader
             printf "\033c"
+            echo "Adding Tux (well, in this case mostly his tuxedo's class) to your Boot Loader..."
+            echo ""
             echo "Do you understand that changing boot loader theme (and potentially the boot"
             echo "loader as well) is not without risk? And we can't be hold responsible if"  
             echo "you proceed. Our website and internet can help but nothing is 100% safe."
@@ -123,72 +125,75 @@ EOF
             echo ""
             echo "(Type 1 or 2, then press ENTER)"
             select yn in "Yes" "No"; do
-            case $yn in
-                Yes ) printf "\033c"
-                    echo "Ok, here we go!"
-                    if [ -d /sys/firmware/efi ]
-                    then 
-                        echo "EFI bootloader detected";
-                        if ! grep -q rodsmith/refind /etc/apt/sources.list /etc/apt/sources.list.d/*; then
-                            # The rEFInd ppa is not registered. Ask if user wants it installed.
-                            echo "Your system is new enough to boot using EFI, but you're not running the more graphical"
-                            echo "bootloader rEFInd. Would you like to install it? (If're not dual-booting, skip this step)"
-                            echo ""
-                            echo "(Type 1 or 2, then press ENTER)"
-                            select yn in "Yes" "No"; do
-                            case $yn in
-                                Yes ) printf "\033c"
-                                    # Commands to add the ppa
-                                    sudo apt-add-repository ppa:rodsmith/refind
-                                    sudo apt-get update
-                                    # Check if refind is installed
-                                    # As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
-                                    MISC="refind"
-                                    for pkg in $MISC; do
-                                        if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
-                                            echo -e "$pkg is already installed"
-                                        else
-                                            if sudo apt-get -qq install $pkg; then
-                                                echo "Successfully installed $pkg"
-                                            else
-                                                echo "Error installing $pkg"
-                                            fi        
-                                        fi
-                                    done
-                                    echo "Done";
-                                    break;;
-                                No ) printf "\033c"
-                                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
-                                    exit;;
-                                esac
-                            done
+                case $yn in
+                    Yes ) printf "\033c"
+                        echo "Ok, here we go!"
+                        if [ -d /sys/firmware/efi ]
+                        then 
+                            echo "EFI bootloader detected";
+                            if ! grep -q rodsmith/refind /etc/apt/sources.list /etc/apt/sources.list.d/*; then
+                                # The rEFInd ppa is not registered. Ask if user wants it installed.
+                                printf "\033c"
+                                echo "Your system is new enough to boot using EFI, but you're not running the more graphical"
+                                echo "bootloader rEFInd. Would you like to install it? (If're not dual-booting, skip this step)"
+                                echo ""
+                                echo "(Type 1 or 2, then press ENTER)"
+                                select yn in "Yes" "No"; do
+                                    case $yn in
+                                        Yes ) printf "\033c"
+                                            # Commands to add the ppa
+                                            sudo apt-add-repository ppa:rodsmith/refind
+                                            sudo apt-get update
+                                            # Check if refind is installed
+                                            # As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
+                                            MISC="refind"
+                                            for pkg in $MISC; do
+                                                if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
+                                                    echo -e "$pkg is already installed"
+                                                else
+                                                    if sudo apt-get -qq install $pkg; then
+                                                        echo "Successfully installed $pkg"
+                                                    else
+                                                        echo "Error installing $pkg"
+                                                    fi        
+                                                fi
+                                            done
+                                            echo "Done";
+                                            break;;
+                                        No ) printf "\033c"
+                                            echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
+                                            exit;;
+                                    esac
+                                done
 
-                        else
+                            else
+                                printf "\033c"
+                                echo "Seems like you have rEFInd installed."
+                            fi
                             printf "\033c"
-                            echo "Seems like you have rEFInd installed."
+                            echo "Initiating to copy folder tux-refind-theme."
+                            sudo mkdir -p /boot/efi/EFI/refind/themes
+                            sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
+                            echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf                        
+                        else 
+                            echo "BIOS boot noticed. ";
                         fi
                         printf "\033c"
-                        echo "Initiating to copy folder tux-refind-theme."
-                        sudo mkdir -p /boot/efi/EFI/refind/themes
-                        sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
-                        echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf                        
-                    else 
-                        echo "BIOS boot noticed. ";
-                    fi
-                    printf "\033c"
-                    echo "Boot Loader theme installed successfully!"
-                    echo ""
-                    read -n1 -r -p "Press any key to continue..." key
-                    break;;
-                No ) printf "\033c"
-                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
-                    echo ""
-                    read -n1 -r -p "Press any key to continue..." key
-                    break;;
+                        echo "Boot Loader theme installed successfully!"
+                        echo ""
+                        read -n1 -r -p "Press any key to continue..." key
+                        break;;
+                    No ) printf "\033c"
+                        echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
+                        echo ""
+                        read -n1 -r -p "Press any key to continue..." key
+                        break;;
                 esac
             done ;;
     "3")    # Boot Logo
             printf "\033c"
+            echo "Adding Tux as Boot Logo..."
+            echo ""
             echo "Do you understand that changing boot logo is not without risk and that we can't"  
             echo "be hold responsible if you proceed. Our website and internet can help but"
             echo "nothing is 100% safe."
@@ -276,59 +281,115 @@ EOF
                 esac
             done
             ;;
-    "4")    
+    "4")    # Login Screen clean-up
             printf "\033c"
-            echo "Starting to copy files and changing dconf settings..."
-            if sudo -n true 2>/dev/null; then 
-                :
-            else
-                echo "Oops, Tux will need your sudo rights to copy and install everything."
-            fi
-            # Copying Tux icon before adding it
-            sudo cp tux-login-theme/cof_tux.png /usr/share/unity-greeter/
-            # Copying that needs to be run as su, and then lightdm. Put it in tmp for easier access
-            sudo cp tux-login-theme/tux-login-gsettings.sh /tmp
-            # Make it executable by all so that lightdm can run it
-            sudo chmod 0755 /tmp/tux-login-gsettings.sh
-            # Need to do it as su, otherwise changes don't take effect
-            sudo bash tux-login-theme/tux-login-script.sh 
-            # Now we can remove the script from tmp
-            sudo rm /tmp/tux-login-gsettings.sh
-            printf "\033c"
-            echo "Successfully tuxedoed up your Login Screen."
+            echo "Adding Tux (well, in this case only his tuxedo's class) to Login Screen..."
             echo ""
-            read -n1 -r -p "Press any key to continue..." key
+            echo "This will disable the standard Ubuntu background and the grid with dots on your"
+            echo "login screen. By doing this the background will stay black all the way from the"
+            echo "boot loader to where the users background will load (which it does at the login" 
+            echo "screen). Ready to do this?"
+            echo ""
+            echo "(Type 1 or 2, then press ENTER)"
+            select yn in "Yes" "No"; do
+                case $yn in
+                    Yes ) 
+                        echo "Starting configure dconf login settings..."
+                        if sudo -n true 2>/dev/null; then 
+                            :
+                        else
+                            echo "Oops, Tux will need your sudo rights to copy and install everything."
+                        fi
+                        # To configure dconf we need to run as su, and then lightdm. 
+                        # But first we put it in tmp for easier access
+                        sudo cp tux-login-theme/tux-login-gsettings.sh /tmp
+                        # Make it executable by all so that lightdm can run it
+                        sudo chmod 0755 /tmp/tux-login-gsettings.sh
+                        # As already mentioned, we need to do it as su, otherwise changes don't take effect
+                        sudo bash tux-login-theme/tux-login-script.sh 
+                        # Now we can remove the script from tmp
+                        sudo rm /tmp/tux-login-gsettings.sh
+                        printf "\033c"
+                        echo "Successfully tuxedoed up your Login Screen."
+                        echo ""
+                        read -n1 -r -p "Press any key to continue..." key
+                        break;;
+                    No ) printf "\033c"
+                        echo "Tux stares at you with a curious look. Then he smiles and says 'Ok'."
+                        break;;
+                esac
+            done            
             ;;
-    "5")    
+    "5")    # Login Screen clean-up
             printf "\033c"
-            echo "Starting to copy files and changing dconf settings..."
-            if sudo -n true 2>/dev/null; then 
-                :
-            else
-                echo "Oops, Tux will need your sudo rights to copy and install everything."
-            fi
-
-            sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
-            sudo apt-get update && sudo apt-get install arc-theme
-            wget http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
-            sudo apt-key add - < Release.key
-            sudo apt-get install unity-tweak-tool
-            #wget -qO- https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-icon-theme/master/install-papirus-home-gtk.sh | sh
-
-            # Install paper-icon-theme
-            sudo add-apt-repository ppa:snwh/pulp
-            sudo apt-get update
-            sudo apt-get install paper-icon-theme
-            sudo apt-get install paper-gtk-theme
-            sudo apt-get install paper-cursor-theme
-
-            sudo cp /media/joe/Projects/Tux4Ubuntu/src/tux-icon-theme/launcher_bfb.png /usr/share/unity/icons/
-
-
-            printf "\033c"
-            echo "Successfully tuxedoed up your Unity Theme."
+            echo "Adding Tux (in this case only his tuxedo's class) to your desktop/icon theme..."
             echo ""
-            read -n1 -r -p "Press any key to continue..." key
+            echo "Tux has scanned the web for the best themes and he likes:"
+            echo "   - Arc Theme by horst3180 <https://github.com/horst3180/arc-theme>"
+            echo "   - Paper Icon Theme at snwh.org <https://snwh.org/paper>"
+            echo "   - Roboto Font by Google <https://www.fontsquirrel.com/fonts/roboto>"
+            echo ""
+            echo "He plans to install these and 'Unity Tweak Tool' (if non of these are installed"
+            echo "already). THEN, he plans to set himself as your 'Search your computer'-icon in"
+            echo "the launcher (the icon furthest up or left depending on where your launcher is)."
+            echo "Are you okay with that?"
+            echo ""
+            echo "(Type 1 or 2, then press ENTER)"
+            select yn in "Yes" "No"; do
+                case $yn in
+                    Yes ) 
+                        printf "\033c"
+                        echo "Starting add these packages..."
+                        if sudo -n true 2>/dev/null; then 
+                            :
+                        else
+                            echo "Oops, Tux will need your sudo rights to copy and install everything."
+                        fi
+                        # Download and install Arc Theme
+                        sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
+                        sudo apt-get update
+                        sudo apt-get install arc-theme
+
+                        arc_temp_dir=$(mktemp -d)
+                        wget -O $arc_temp_dir/Release.key http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
+                        sudo apt-key add - < $arc_temp_dir/Release.key
+                        
+                        # Download and install Paper Icon Theme
+                        sudo add-apt-repository ppa:snwh/pulp
+                        sudo apt-get update
+                        sudo apt-get install paper-icon-theme
+                        sudo apt-get install paper-gtk-theme
+                        sudo apt-get install paper-cursor-theme
+                        
+                        # Download and install Roboto Fonts (as described here: https://wiki.ubuntu.com/Fonts)
+                        roboto_temp_dir=$(mktemp -d)
+                        wget -O $roboto_temp_dir/roboto.zip https://www.fontsquirrel.com/fonts/download/roboto
+                        unzip $roboto_temp_dir/roboto.zip -d $roboto_temp_dir
+                        sudo mkdir -p ~/.fonts
+                        sudo cp $roboto_temp_dir/*.ttf ~/.fonts/
+                        fc-cache -f -v
+
+                        # Install Unity Tweak Tool
+                        sudo apt-get install unity-tweak-tool
+                        
+                        # Copy an image of himself as your default launcher icon
+                        sudo cp /media/joe/Projects/Tux4Ubuntu/src/tux-icon-theme/launcher_bfb.png /usr/share/unity/icons/
+
+                        printf "\033c"
+                        echo "Successfully tuxedoed up your Unity Theme."
+                        echo ""
+                        read -n1 -r -p "Press any key to continue..." key
+
+
+
+                        break;;
+                    No ) printf "\033c"
+                        echo "Tux stares at you with a curious look. Then he smiles and says 'Ok'."
+                        echo ""
+                        read -n1 -r -p "Press any key to continue..." key
+                        break;;
+                esac
+            done            
             ;;
     "Q")    exit                      ;;
     "q")    exit                      ;;

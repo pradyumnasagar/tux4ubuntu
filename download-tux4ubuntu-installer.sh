@@ -1,5 +1,5 @@
 #!/bin/sh
-
+# This installer is inspired by Papirus Development Team: https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/install-papirus-home-gtk.sh
 set -e
 
 gh_repo="tux4ubuntu"
