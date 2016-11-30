@@ -189,104 +189,90 @@ EOF
             done ;;
     "3")    # Boot Logo
             printf "\033c"
-            echo "Are you running Ubuntu 16.04?"
+            echo "Do you understand that changing boot logo is not without risk and that we can't"  
+            echo "be hold responsible if you proceed. Our website and internet can help but"
+            echo "nothing is 100% safe."
             echo ""
             echo "(Type 1 or 2, then press ENTER)"            
             select yn in "Yes" "No"; do
                 case $yn in
-                    Yes ) printf "\033c"
-                        echo "Do you understand that changing boot logo is not without risk? And we can't"  
-                        echo "be hold responsible if you proceed. Our website and internet can help but"
-                        echo "nothing is 100% safe."
+                    Yes ) 
+                        printf "\033c"
+                        if sudo -n true 2>/dev/null; then 
+                            :
+                        else
+                            echo "Tux will need sudo rights to copy and install everything, so he'll ask about that below."
+                            echo ""
+                            read -n1 -r -p "Press any key to continue..." key
+                        fi
+
+
+                        # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
+                        # so instead of simply sudo cp -r tux-plymouth-theme/ $plymouth_dir/themes/tux-plymouth-theme we 
+                        # have to (6 steps):
+                            
+                        # 1) Add other themes through the apt-get package 'plymouth-themes' that seem to work as well as 'xclip'
+                        # -package to successfully copy the internals of tux.script, tux.plymouth to a copy of the plymouth-themes's
+                        # 'script'-theme. To do this, we first check if xclip and plymouth-themes is installed, and if not, we ask the user if they
+                        # are okey with installing them. As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
+                        MISC="plymouth-themes xclip"
+                        for pkg in $MISC; do
+                            if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
+                                echo -e "$pkg is already installed"
+                            else
+                                echo "Oops... Tux needs to use apt-get package $pkg to proceed."
+                                echo ""
+                                if sudo apt-get -qq install $pkg; then
+                                    echo "Successfully installed $pkg"
+                                else
+                                    echo "Error installing $pkg"
+                                fi        
+                            fi
+                        done
+
+                        # 2) Copy one of these themes, the theme called script.
+                        sudo cp -r $plymouth_dir/themes/script $plymouth_dir/themes/tux-plymouth-theme;  
+                        
+                        # 3) Add tux-plymouth-theme files
+                        sudo cp -r tux-plymouth-theme/* $plymouth_dir/themes/tux-plymouth-theme;
+                        
+                        # 4) Copy the internals of our files to existing using xclip
+                        xclip $plymouth_dir/themes/tux-plymouth-theme/tux.script;
+                        sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.script';
+                        xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.script;
+                        xclip $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
+                        sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.plymouth';
+                        xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.plymouth;                          
+                        
+                        # 5) Remove our own files
+                        sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
+                        sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.script;
+                        
+                        # 6) And rename the newly created copies
+                        sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.script $plymouth_dir/themes/tux-plymouth-theme/tux.script
+                        sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth
+
+                        # Then we can add it to default.plymouth and update update-initramfs accordingly
+                        sudo update-alternatives --install $plymouth_dir/themes/default.plymouth default.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth 100;
+                        printf "\033c"
+                        echo "Below you will see a list with all themes available to choose tux in the Plymouth menu next (if you want Tux that is ;)";
                         echo ""
-                        echo "(Type 1 or 2, then press ENTER)"
-                        select yn in "Yes" "No"; do
-                            case $yn in
-                                Yes ) printf "\033c"
-                                    if sudo -n true 2>/dev/null; then 
-                                        :
-                                    else
-                                        echo "Tux will need sudo rights to copy and install everything, so he'll ask about that below."
-                                        echo ""
-                                        read -n1 -r -p "Press any key to continue..." key
-                                    fi
-
-
-                                    # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
-                                    # so instead of simply sudo cp -r tux-plymouth-theme/ $plymouth_dir/themes/tux-plymouth-theme we 
-                                    # have to (6 steps):
-                                        
-                                    # 1) Add other themes through the apt-get package 'plymouth-themes' that seem to work as well as 'xclip'
-                                    # -package to successfully copy the internals of tux.script, tux.plymouth to a copy of the plymouth-themes's
-                                    # 'script'-theme. To do this, we first check if xclip and plymouth-themes is installed, and if not, we ask the user if they
-                                    # are okey with installing them. As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
-                                    MISC="plymouth-themes xclip"
-                                    for pkg in $MISC; do
-                                        if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
-                                            echo -e "$pkg is already installed"
-                                        else
-                                            echo "Oops... Tux needs to use apt-get package $pkg to proceed."
-                                            echo ""
-                                            if sudo apt-get -qq install $pkg; then
-                                                echo "Successfully installed $pkg"
-                                            else
-                                                echo "Error installing $pkg"
-                                            fi        
-                                        fi
-                                    done
-
-                                    # 2) Copy one of these themes, the theme called script.
-                                    sudo cp -r $plymouth_dir/themes/script $plymouth_dir/themes/tux-plymouth-theme;  
-                                    
-                                    # 3) Add tux-plymouth-theme files
-                                    sudo cp -r tux-plymouth-theme/* $plymouth_dir/themes/tux-plymouth-theme;
-                                    
-                                    # 4) Copy the internals of our files to existing using xclip
-                                    xclip $plymouth_dir/themes/tux-plymouth-theme/tux.script;
-                                    sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.script';
-                                    xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.script;
-                                    xclip $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
-                                    sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.plymouth';
-                                    xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.plymouth;                          
-                                    
-                                    # 5) Remove our own files
-                                    sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
-                                    sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.script;
-                                    
-                                    # 6) And rename the newly created copies
-                                    sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.script $plymouth_dir/themes/tux-plymouth-theme/tux.script
-                                    sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth
-
-                                    # Then we can add it to default.plymouth and update update-initramfs accordingly
-                                    sudo update-alternatives --install $plymouth_dir/themes/default.plymouth default.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth 100;
-                                    printf "\033c"
-                                    echo "Below you will see a list with all themes available to choose tux in the Plymouth menu next (if you want Tux that is ;)";
-                                    echo ""
-                                    read -n1 -r -p "Press any key to continue..." key
-                                    sudo update-alternatives --config default.plymouth;
-                                    printf "\033c"
-                                    echo "Updating initramfs. This could take a while."
-                                    sudo update-initramfs -u;
-                                    printf "\033c"
-                                    echo "Tux successfully moved in as your new Boot Logo."
-                                    echo ""
-                                    read -n1 -r -p "Press any key to continue..." key
-                                    break;;
-                                No ) printf "\033c"
-                                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
-                                    echo ""
-                                    read -n1 -r -p "Press any key to continue..." key
-                                    break;;
-                                esac
-                            done
-                        break;;
-                    No )  printf "\033c"
-                        echo "We're working on adding support for other Linux distributions and Ubuntu"
-                        echo "versions. So hang tight. Or edit this .sh file and give it a try. "
-                        echo "Let us know if it works or doesn't! Tux will be happy for your contributions."
+                        read -n1 -r -p "Press any key to continue..." key
+                        sudo update-alternatives --config default.plymouth;
+                        printf "\033c"
+                        echo "Updating initramfs. This could take a while."
+                        sudo update-initramfs -u;
+                        printf "\033c"
+                        echo "Tux successfully moved in as your new Boot Logo."
                         echo ""
                         read -n1 -r -p "Press any key to continue..." key
                         break;;
+                    No )
+                        printf "\033c"
+                        echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
+                        echo ""
+                        read -n1 -r -p "Press any key to continue..." key
+                    break;;
                 esac
             done
             ;;
