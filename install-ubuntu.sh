@@ -1,29 +1,87 @@
 #!/bin/bash
+#
+# install-ubuntu.sh - Tux4Ubuntu Installer
+#                                                   
+# Copyright (C) 2016 Tux4Ubuntu Initiative <http://tux4ubuntu.blogspot.com>
+#
+# Permission is hereby granted, free of charge, 
+# to any person obtaining a copy of this software and 
+# associated documentation files (the "Software"), to 
+# deal in the Software without restriction, including 
+# without limitation the rights to use, copy, modify, 
+# merge, publish, distribute, sublicense, and/or sell 
+# copies of the Software, and to permit persons to whom 
+# the Software is furnished to do so, 
+# subject to the following conditions:
+#
+# The above copyright notice and this permission notice 
+# shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR 
+# ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# 
+# Written and designed by: Tuxedo Joe <http://github.com/tuxedojoe>
+# for The Tux4Ubuntu Initiative <http://tux4ubuntu.blogspot.com>
+#
+# For CREDITS AND ATTRIBUTION see README 
+
 cd "$(dirname "$0")"
 set -e
 printf "\033c"
 
-# TODO: Add to search on /lib/plymouth/themes. On other systems it is /usr/share/plymouth
-#       More info on other OSes: http://brej.org/blog/?p=158
-
-# Menu system as found here: http://stackoverflow.com/questions/20224862/bash-script-always-show-menu-after-loop-execution
-# Tux as ASCII found here: http://www.chris.com/ascii/index.php?art=logos%20and%20insignias/linux
-
-#!/bin/bash
-OSVER="16.04"
-if [[ `lsb_release -rs` != $OSVER ]] # replace 8.04 by the number of release you want
+# Here we change paths that are OS version dependant
+# More info on other OSes regarding plymouth: http://brej.org/blog/?p=158
+if [[ `lsb_release -rs` == "16.04" ]]
 then
-	echo "Sorry, need 16.04 to run this installer. Find your version at"
-    echo "http://github.com/tuxedojoe/tux4ubuntu/"	
-    echo ""
-    echo "(Or fork/edit our project/install_xxx.sh for your system, and then make a"
+    # The plymouth dir was moved in one update, therefore we have prepared for this one here
+	plymouth_dir="/usr/share/plymouth"
+elif [[ `lsb_release -rs` == "15.04" ]]
+then
+	plymouth_dir="/usr/share/plymouth"
+else
+	echo "Sorry! We haven't tried installing Tux4Ubuntu on your Linux distrubtion."
+    echo "Make sure you have the latest version at http://tux4ubuntu.blogspot.com"	
+    echo "(Or fork/edit our project/install-ubuntu.sh for your system, and then make a"
     echo "pull request/send it to us so that more people can use it)"
-    exit
+    echo ""
+    echo "Want to go ahead anyway? (Can be a bumby ride, but it might work flawless)"
+    echo ""
+    echo "(Type 1 or 2, then press ENTER)"            
+    select yn in "Yes" "No"; do
+        case $yn in
+            Yes ) printf "\033c"
+                echo "Ahh, a brave one! Tux salutes you!"
+                echo "(If you get any error message, copy/paste on our website/stackoverflow"
+                echo "and if it works, please write a comment on our start page and let us know)"
+                echo ""
+                read -n1 -r -p "Press any key to continue..." key
+               	
+                # We set the 
+                plymouth_dir="/usr/share/plymouth"
+
+                break;;
+
+            No ) printf "\033c"
+                echo "Feel free to try when you're ready. Tux will be waiting."
+                echo ""
+                read -n1 -r -p "Press any key to continue..." key
+                exit
+                break;;
+        esac
+    done
+
 fi
+
 
 while :
 do
     clear
+    # Menu system as found here: http://stackoverflow.com/questions/20224862/bash-script-always-show-menu-after-loop-execution
     cat<<EOF    
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ TUX 4 UBUNTU                                    © 2016 Tux4Ubuntu Initiative ║
@@ -137,9 +195,9 @@ EOF
             select yn in "Yes" "No"; do
                 case $yn in
                     Yes ) printf "\033c"
-                        echo "Do you understand that changing boot loader theme (and potentially the boot"
-                        echo "loader as well) is not without risk? And we can't be hold responsible if"  
-                        echo "you proceed. Our website and internet can help but nothing is 100% safe."
+                        echo "Do you understand that changing boot logo is not without risk? And we can't"  
+                        echo "be hold responsible if you proceed. Our website and internet can help but"
+                        echo "nothing is 100% safe."
                         echo ""
                         echo "(Type 1 or 2, then press ENTER)"
                         select yn in "Yes" "No"; do
@@ -155,7 +213,7 @@ EOF
 
 
                                     # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
-                                    # so instead of simply sudo cp -r tux-plymouth-theme/ /usr/share/plymouth/themes/tux-plymouth-theme we 
+                                    # so instead of simply sudo cp -r tux-plymouth-theme/ $plymouth_dir/themes/tux-plymouth-theme we 
                                     # have to (6 steps):
                                         
                                     # 1) Add other themes through the apt-get package 'plymouth-themes' that seem to work as well as 'xclip'
@@ -178,29 +236,29 @@ EOF
                                     done
 
                                     # 2) Copy one of these themes, the theme called script.
-                                    sudo cp -r /usr/share/plymouth/themes/script /usr/share/plymouth/themes/tux-plymouth-theme;  
+                                    sudo cp -r $plymouth_dir/themes/script $plymouth_dir/themes/tux-plymouth-theme;  
                                     
                                     # 3) Add tux-plymouth-theme files
-                                    sudo cp -r tux-plymouth-theme/* /usr/share/plymouth/themes/tux-plymouth-theme;
+                                    sudo cp -r tux-plymouth-theme/* $plymouth_dir/themes/tux-plymouth-theme;
                                     
                                     # 4) Copy the internals of our files to existing using xclip
-                                    xclip /usr/share/plymouth/themes/tux-plymouth-theme/tux.script;
-                                    sudo bash -c '> /usr/share/plymouth/themes/tux-plymouth-theme/script.script';
-                                    xclip -out | sudo tee -a /usr/share/plymouth/themes/tux-plymouth-theme/script.script;
-                                    xclip /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth;
-                                    sudo bash -c '> /usr/share/plymouth/themes/tux-plymouth-theme/script.plymouth';
-                                    xclip -out | sudo tee -a /usr/share/plymouth/themes/tux-plymouth-theme/script.plymouth;                          
+                                    xclip $plymouth_dir/themes/tux-plymouth-theme/tux.script;
+                                    sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.script';
+                                    xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.script;
+                                    xclip $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
+                                    sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.plymouth';
+                                    xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.plymouth;                          
                                     
                                     # 5) Remove our own files
-                                    sudo rm /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth;
-                                    sudo rm /usr/share/plymouth/themes/tux-plymouth-theme/tux.script;
+                                    sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
+                                    sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.script;
                                     
                                     # 6) And rename the newly created copies
-                                    sudo mv /usr/share/plymouth/themes/tux-plymouth-theme/script.script /usr/share/plymouth/themes/tux-plymouth-theme/tux.script
-                                    sudo mv /usr/share/plymouth/themes/tux-plymouth-theme/script.plymouth /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth
+                                    sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.script $plymouth_dir/themes/tux-plymouth-theme/tux.script
+                                    sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth
 
                                     # Then we can add it to default.plymouth and update update-initramfs accordingly
-                                    sudo update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/tux-plymouth-theme/tux.plymouth 100;
+                                    sudo update-alternatives --install $plymouth_dir/themes/default.plymouth default.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth 100;
                                     printf "\033c"
                                     echo "Below you will see a list with all themes available to choose tux in the Plymouth menu next (if you want Tux that is ;)";
                                     echo ""
