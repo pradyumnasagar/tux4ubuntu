@@ -278,6 +278,8 @@ EOF
             sudo apt-get install paper-gtk-theme
             sudo apt-get install paper-cursor-theme
 
+            sudo cp /media/joe/Projects/Tux4Ubuntu/src/tux-icon-theme/launcher_bfb.png /usr/share/unity/icons/
+
 
             printf "\033c"
             echo "Successfully tuxedoed up your Unity Theme."
