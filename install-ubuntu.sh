@@ -88,7 +88,7 @@ do
 ║ Let's bring Tux to Ubuntu                     http://tux4ubuntu.blogspot.com ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                              ║
-║   Where do you want Tux?                                                     ║
+║   Where do you want Tux? (Type in one of the following numbers)              ║
 ║                                                                              ║
 ║   1) Everywhere                                - Install all of the below    ║
 ║   ------------------------------------------------------------------------   ║
@@ -162,7 +162,7 @@ EOF
                                             break;;
                                         No ) printf "\033c"
                                             echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
-                                            exit;;
+                                            break;;
                                     esac
                                 done
 
@@ -302,11 +302,11 @@ EOF
                         fi
                         # To configure dconf we need to run as su, and then lightdm. 
                         # But first we put it in tmp for easier access
-                        sudo cp tux-login-theme/tux-login-gsettings.sh /tmp
+                        sudo cp tux-login-cleanup/tux-login-gsettings.sh /tmp
                         # Make it executable by all so that lightdm can run it
                         sudo chmod 0755 /tmp/tux-login-gsettings.sh
                         # As already mentioned, we need to do it as su, otherwise changes don't take effect
-                        sudo bash tux-login-theme/tux-login-script.sh 
+                        sudo bash tux-login-cleanup/tux-login-script.sh 
                         # Now we can remove the script from tmp
                         sudo rm /tmp/tux-login-gsettings.sh
                         printf "\033c"
@@ -320,7 +320,7 @@ EOF
                 esac
             done            
             ;;
-    "5")    # Login Screen clean-up
+    "5")    # Desktop theming
             printf "\033c"
             echo "Adding Tux (in this case only his tuxedo's class) to your desktop/icon theme..."
             echo ""
@@ -345,43 +345,80 @@ EOF
                         else
                             echo "Oops, Tux will need your sudo rights to copy and install everything."
                         fi
-                        # Download and install Arc Theme
-                        sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
-                        sudo apt-get update
-                        sudo apt-get install arc-theme
-
-                        arc_temp_dir=$(mktemp -d)
-                        wget -O $arc_temp_dir/Release.key http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
-                        sudo apt-key add - < $arc_temp_dir/Release.key
-                        
-                        # Download and install Paper Icon Theme
-                        sudo add-apt-repository ppa:snwh/pulp
-                        sudo apt-get update
-                        sudo apt-get install paper-icon-theme
-                        sudo apt-get install paper-gtk-theme
-                        sudo apt-get install paper-cursor-theme
-                        
+                        # Check if ppa's exists, otherwise add them
+                        arc_ppa_added=false
+                        any_ppa_added=false
+                        if grep -q Horst3180 /etc/apt/sources.list /etc/apt/sources.list.d/*; then
+                            echo "Horst3180 already added to ppa."
+                        else
+                            printf "\033c"
+                            echo "Adding Horst3180/arc-theme to ppa."
+                            sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
+                            $arc_ppa_added=true
+                            $any_ppa_added=true
+                        fi
+                        if grep -q snwh/pulp /etc/apt/sources.list /etc/apt/sources.list.d/*; then
+                            echo "snwh/pulp already added to ppa."
+                        else
+                            printf "\033c"
+                            echo "Adding snwh/pulp to ppa."
+                            sudo add-apt-repository ppa:snwh/pulp
+                            $any_ppa_added=true
+                        fi
+                        # Update apt-get
+                        if [ "$any_ppa_added" = true ]; then
+                            sudo apt-get update
+                        fi
+                        # Install packages
+                        MISC="arc-theme paper-icon-theme paper-gtk-theme paper-cursor-theme unity-tweak-tool"
+                        for pkg in $MISC; do
+                            if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
+                                echo -e "$pkg is already installed"
+                            else
+                                if sudo apt-get -qq install $pkg; then
+                                    echo "Successfully installed $pkg"
+                                else
+                                    echo "Error installing $pkg"
+                                fi        
+                            fi
+                        done
+                        # Add release keys where apt-key support it
+                        if [ "$arc_ppa_added" = true ]; then
+                            arc_temp_dir=$(mktemp -d)
+                            wget -O $arc_temp_dir/Release.key http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
+                            sudo apt-key add - < $arc_temp_dir/Release.key
+                        fi
                         # Download and install Roboto Fonts (as described here: https://wiki.ubuntu.com/Fonts)
-                        roboto_temp_dir=$(mktemp -d)
-                        wget -O $roboto_temp_dir/roboto.zip https://www.fontsquirrel.com/fonts/download/roboto
-                        unzip $roboto_temp_dir/roboto.zip -d $roboto_temp_dir
-                        sudo mkdir -p ~/.fonts
-                        sudo cp $roboto_temp_dir/*.ttf ~/.fonts/
-                        fc-cache -f -v
-
-                        # Install Unity Tweak Tool
-                        sudo apt-get install unity-tweak-tool
-                        
-                        # Copy an image of himself as your default launcher icon
+                        if fc-list | grep -i roboto >/dev/null; then
+			                echo "Roboto fonts already installed"
+                        else
+                            echo "Installing Roboto fonts by Google"
+                            roboto_temp_dir=$(mktemp -d)
+                            wget -O $roboto_temp_dir/roboto.zip https://www.fontsquirrel.com/fonts/download/roboto
+                            unzip $roboto_temp_dir/roboto.zip -d $roboto_temp_dir
+                            sudo mkdir -p ~/.fonts
+                            sudo cp $roboto_temp_dir/*.ttf ~/.fonts/
+                            printf "Updating font cache (may take a while)"
+                            fc-cache -f -v
+                        fi
+                        # Copy an image of Tux to be your default launcher icon
                         sudo cp /media/joe/Projects/Tux4Ubuntu/src/tux-icon-theme/launcher_bfb.png /usr/share/unity/icons/
-
                         printf "\033c"
-                        echo "Successfully tuxedoed up your Unity Theme."
+                        echo "Successfully installed theme, icons and fonts (and Tux on your launcher)." 
+                        echo "We'll open Unity Tweak Tool for you and there you can choose"
+                        echo "(which is suggested by Tux):"
                         echo ""
-                        read -n1 -r -p "Press any key to continue..." key
-
-
-
+                        echo "Under Themes      ->      Choose 'Arc'"
+                        echo "Under Icons       ->      Choose 'Paper'"
+                        echo "Under Fonts       ->      Default Font -> 'Roboto Regular'"
+                        echo "                          Window Title Font -> 'Roboto Black'"
+                        echo ""
+                        echo "IMPORTANT: Close Unity Tweak Tool to continue installation."
+                        read -n1 -r -p "Press any key to open Unity Tweak Tool..." key
+                        unity-tweak-tool -a
+                        printf "\033c"
+                        echo "Successfully added some theming options á la Tux."
+                        sleep 1.8
                         break;;
                     No ) printf "\033c"
                         echo "Tux stares at you with a curious look. Then he smiles and says 'Ok'."
