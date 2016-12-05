@@ -29,4 +29,4 @@ wget -O "/tmp/$gh_repo.tar.gz" \
 echo "=> Unpacking archive ..."
 tar -xzf "/tmp/$gh_repo.tar.gz" -C "$temp_dir"
 echo "=> Launching installer..."
-sudo $temp_dir/tux4ubuntu-master/install-ubuntu.sh
+$temp_dir/tux4ubuntu-master/install-ubuntu.sh
