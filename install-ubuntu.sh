@@ -74,7 +74,6 @@ else
                 break;;
         esac
     done
-
 fi
 
 function change_boot_loader { 
@@ -84,18 +83,13 @@ function change_boot_loader {
     echo "Do you understand that changing boot loader theme (and potentially the boot"
     echo "loader as well) is not without risk? And we can't be hold responsible if"  
     echo "you proceed. Our website and internet can help but nothing is 100% safe."
-    if sudo -n true 2>/dev/null; then 
-        :
-    else
-        echo ""
-        echo "Oh, and Tux need sudo rights to copy and install everything, so we'll ask about that soon."
-    fi
+    echo ""
+    check_sudo
     echo ""
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) printf "\033c"
-                echo "Ok, here we go!"
                 if [ -d /sys/firmware/efi ]
                 then 
                     echo "EFI bootloader detected";
@@ -113,19 +107,7 @@ function change_boot_loader {
                                     sudo apt-add-repository ppa:rodsmith/refind
                                     sudo apt-get update
                                     # Check if refind is installed
-                                    # As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
-                                    MISC="refind"
-                                    for pkg in $MISC; do
-                                        if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
-                                            echo -e "$pkg is already installed"
-                                        else
-                                            if sudo apt-get -qq install $pkg; then
-                                                echo "Successfully installed $pkg"
-                                            else
-                                                echo "Error installing $pkg"
-                                            fi        
-                                        fi
-                                    done
+                                    install_if_not_found "refind"
                                     echo "Done";
                                     break;;
                                 No ) printf "\033c"
@@ -144,7 +126,26 @@ function change_boot_loader {
                     sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
                     echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf                        
                 else 
-                    echo "BIOS boot noticed. ";
+                    echo "BIOS boot noticed. If you're running a newer system that support EFI, check"
+                    echo "out your BIOS settings (switching from Legacy to UEFI/EFI might do the trick"
+                    echo "and will enable a lot more customization to your boot loader."
+                    echo ""
+                    echo "If you're running an older system (or maybe you're running a virtual machine)"
+                    echo "Tux can customize the BIOS capable grub2 loader a little as well. Want to try?";
+                    select yn in "Yes" "No"; do
+                        case $yn in
+                            Yes ) printf "\033c"
+                                # Install grub2 theme
+                                sudo cp -r tux-grub2-theme /boot/grub/themes/
+                                sudo grep -q -F 'GRUB_THEME="' /etc/default/grub || sudo sh -c "echo 'GRUB_THEME="/boot/grub/themes/tux-grub2-theme/theme.txt"' >> /etc/default/grub"
+                                sudo grub-mkconfig -o /boot/grub/grub.cfg
+                                echo "Done";
+                                break;;
+                            No ) printf "\033c"
+                                echo "Tux stares at you with a curious look. Then he smiles and says 'Ok'."
+                                break;;
+                        esac
+                    done
                 fi
                 printf "\033c"
                 echo "Boot Loader theme installed successfully!"
@@ -173,15 +174,7 @@ function change_boot_logo {
         case $yn in
             Yes ) 
                 printf "\033c"
-                if sudo -n true 2>/dev/null; then 
-                    :
-                else
-                    echo "Tux will need sudo rights to copy and install everything, so he'll ask about that below."
-                    echo ""
-                    read -n1 -r -p "Press any key to continue..." key
-                fi
-
-
+                check_sudo
                 # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
                 # so instead of simply sudo cp -r tux-plymouth-theme/ $plymouth_dir/themes/tux-plymouth-theme we 
                 # have to (6 steps):
@@ -266,11 +259,7 @@ function change_login_screen {
         case $yn in
             Yes ) 
                 echo "Starting configure dconf login settings..."
-                if sudo -n true 2>/dev/null; then 
-                    :
-                else
-                    echo "Oops, Tux will need your sudo rights to copy and install everything."
-                fi
+                check_sudo
                 # To configure dconf we need to run as su, and then lightdm. 
                 # But first we put it in tmp for easier access
                 sudo cp tux-login-cleanup/tux-login-gsettings.sh /tmp
@@ -312,11 +301,7 @@ function change_desktop {
             Yes ) 
                 printf "\033c"
                 echo "Starting add these packages..."
-                if sudo -n true 2>/dev/null; then 
-                    :
-                else
-                    echo "Oops, Tux will need your sudo rights to copy and install everything."
-                fi
+                check_sudo
                 # Check if ppa's exists, otherwise add them
                 arc_ppa_added=false
                 any_ppa_added=false
@@ -401,7 +386,30 @@ function change_desktop {
     done
 }
 
+function check_sudo {
+    if sudo -n true 2>/dev/null; then 
+        :
+    else
+        echo "Tux will need sudo rights to copy and install everything, so he'll ask about that below."
+        echo ""
+        read -n1 -r -p "Press any key to continue..." key
+    fi
+}
 
+function install_if_not_found { 
+    # As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
+    for pkg in $1; do
+        if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
+            echo -e "$pkg is already installed"
+        else
+            if sudo apt-get -qq install $pkg; then
+                echo "Successfully installed $pkg"
+            else
+                echo "Error installing $pkg"
+            fi        
+        fi
+    done
+}
 
 while :
 do
