@@ -433,7 +433,11 @@ do
 EOF
     read -n1 -s
     case "$REPLY" in
-    "1")    echo "you chose choice 1" ;;
+    "1")    # Install everything
+            change_boot_loader
+            change_boot_logo
+            change_login_screen
+            change_desktop;;
     "2")    change_boot_loader ;;
     "3")    change_boot_logo ;;
     "4")    change_login_screen ;;
