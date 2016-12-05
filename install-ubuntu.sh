@@ -437,11 +437,20 @@ EOF
             change_boot_loader
             change_boot_logo
             change_login_screen
-            change_desktop;;
+            change_desktop
+            ;;
     "2")    change_boot_loader ;;
     "3")    change_boot_logo ;;
     "4")    change_login_screen ;;
     "5")    change_desktop ;;
+    "6")    # Wallpaper 
+            ;;
+    "7")    # Games
+            ;;
+    "8")    # Buy the t-shirt
+            ;;
+    "9")    # Uninstall
+            ;;
     "Q")    exit                      ;;
     "q")    exit                      ;;
      * )    echo "invalid option"     ;;
