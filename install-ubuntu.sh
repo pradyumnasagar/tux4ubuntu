@@ -397,6 +397,51 @@ function change_desktop {
     read -n1 -r -p "Press any key to continue..." key
 }
 
+function change_wallpaper {
+    echo "wallpaper"
+}
+
+function install_games {
+    printf "\033c"
+    header "Adding Tux GAMES" "$1"
+    echo "This will install the following classic Tux games:"
+    echo "  - SuperTux                          (A lot like Super Mario)"
+    echo "  - SuperTuxKart                      (A lot like Mario Kart)"
+    echo "  - Extreme Tux Racer                 (Help Tux slide down slopes)"
+    echo "  - FreedroidRPG                      (Sci-fi isometric role playing)"
+    echo "  - WarMUX                            (A lot like Worms)"
+    echo ""
+    echo "Ready to try some gaming with The Tux!?"
+    echo ""
+    echo "(Type 1 or 2, then press ENTER)"
+    select yn in "Yes" "No"; do
+        case $yn in
+            Yes ) 
+                echo "Initiating Tux Games install..."
+                install_if_not_found "supertux supertuxkart extremetuxracer freedroidrpg warmux"
+                printf "\033c"
+                header "Adding Tux GAMES" "$1"
+                echo "Successfully installed the Tux Games."
+                break;;
+            No ) printf "\033c"
+                header "Adding Tux GAMES" "$1"
+                echo "The sound of Tux flapping with his feets slowly turns silent when he realizes" 
+                echo "your response... He shrugs and answer with a lowly voice 'ok'."
+                break;;
+        esac
+    done
+    echo ""
+    read -n1 -r -p "Press any key to continue..." key
+}
+
+function get_the_tshirt {
+    echo "get_the_tshirt"
+}
+
+function uninstall {
+    echo "uninstall"
+}
+
 function check_sudo {
     if sudo -n true 2>/dev/null; then 
         :
@@ -503,12 +548,9 @@ EOF
     "4")    change_login_screen ;;
     "5")    change_desktop ;;
     "6")    change_wallpaper ;;
-    "7")    # Games
-            ;;
-    "8")    # Buy the t-shirt
-            ;;
-    "9")    # Uninstall
-            ;;
+    "7")    install_games ;;
+    "8")    get_the_tshirt ;;
+    "9")    uninstall ;;
     "Q")    exit                      ;;
     "q")    exit                      ;;
      * )    echo "invalid option"     ;;
