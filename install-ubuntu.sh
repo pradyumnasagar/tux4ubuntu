@@ -78,26 +78,27 @@ fi
 
 function change_boot_loader { 
     printf "\033c"
-    echo "Adding Tux (well, in this case mostly his tuxedo's class) to your Boot Loader..."
-    echo ""
+    header "Adding Tux to BOOT LOADER"
     echo "Do you understand that changing boot loader theme (and potentially the boot"
     echo "loader as well) is not without risk? And we can't be hold responsible if"  
     echo "you proceed. Our website and internet can help but nothing is 100% safe."
-    echo ""
     check_sudo
-    echo ""
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) printf "\033c"
                 if [ -d /sys/firmware/efi ]
                 then 
-                    echo "EFI bootloader detected";
                     if ! grep -q rodsmith/refind /etc/apt/sources.list /etc/apt/sources.list.d/*; then
                         # The rEFInd ppa is not registered. Ask if user wants it installed.
                         printf "\033c"
+                        echo "EFI bootloader detected";
+                        echo ""
                         echo "Your system is new enough to boot using EFI, but you're not running the more graphical"
-                        echo "bootloader rEFInd. Would you like to install it? (If're not dual-booting, skip this step)"
+                        echo "bootloader rEFInd. Would you like to install it? Select No if:"
+                        echo "    - You want to keep the standard (a bit more stable) GRUB2 boot loader"
+                        echo "    - You want to theme GRUB2 instead (not as cool but it gets nicer)"
+                        echo "    - You are not dual-booting (since the boot loader only let you choose between OSes)"
                         echo ""
                         echo "(Type 1 or 2, then press ENTER)"
                         select yn in "Yes" "No"; do
@@ -111,11 +112,23 @@ function change_boot_loader {
                                     echo "Done";
                                     break;;
                                 No ) printf "\033c"
-                                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
-                                    break;;
+                                    # Let the user choose if they want to install Grub2 theme instead
+                                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
+                                    echo ""
+                                    echo "However, Tux can also customize your GRUB 2 theme. Want to try?"
+                                    select yn in "Yes" "No"; do
+                                        case $yn in
+                                            Yes ) printf "\033c"
+                                                printf "\033c"
+                                                change_grub2_theme
+                                                break;;
+                                            No ) printf "\033c"
+                                                echo "'Come back when you're ready, I'll be waiting here' says Tux."
+                                                break;;
+                                        esac
+                                    done
                             esac
                         done
-
                     else
                         printf "\033c"
                         echo "Seems like you have rEFInd installed."
@@ -135,11 +148,7 @@ function change_boot_loader {
                     select yn in "Yes" "No"; do
                         case $yn in
                             Yes ) printf "\033c"
-                                # Install grub2 theme
-                                sudo cp -r tux-grub2-theme /boot/grub/themes/
-                                sudo grep -q -F 'GRUB_THEME="' /etc/default/grub || sudo sh -c "echo 'GRUB_THEME="/boot/grub/themes/tux-grub2-theme/theme.txt"' >> /etc/default/grub"
-                                sudo grub-mkconfig -o /boot/grub/grub.cfg
-                                echo "Done";
+
                                 break;;
                             No ) printf "\033c"
                                 echo "Tux stares at you with a curious look. Then he smiles and says 'Ok'."
@@ -163,8 +172,7 @@ function change_boot_loader {
 
 function change_boot_logo {
     printf "\033c"
-    echo "Adding Tux as Boot Logo..."
-    echo ""
+    header "Addding Tux as BOOT LOGO"
     echo "Do you understand that changing boot logo is not without risk and that we can't"  
     echo "be hold responsible if you proceed. Our website and internet can help but"
     echo "nothing is 100% safe."
@@ -183,6 +191,8 @@ function change_boot_logo {
                 # -package to successfully copy the internals of tux.script, tux.plymouth to a copy of the plymouth-themes's
                 # 'script'-theme. To do this, we first check if xclip and plymouth-themes is installed, and if not, we ask the user if they
                 # are okey with installing them. As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
+                
+                # TODO: install_if_not_found plymouth-themes xclip
                 MISC="plymouth-themes xclip"
                 for pkg in $MISC; do
                     if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
@@ -197,6 +207,7 @@ function change_boot_logo {
                         fi        
                     fi
                 done
+
 
                 # 2) Copy one of these themes, the theme called script.
                 sudo cp -r $plymouth_dir/themes/script $plymouth_dir/themes/tux-plymouth-theme;  
@@ -247,8 +258,7 @@ function change_boot_logo {
 
 function change_login_screen {
     printf "\033c"
-    echo "Adding Tux (well, in this case only his tuxedo's class) to Login Screen..."
-    echo ""
+    header "Adding tuxedo class to your LOGIN SCREEN"
     echo "This will disable the standard Ubuntu background and the grid with dots on your"
     echo "login screen. By doing this the background will stay black all the way from the"
     echo "boot loader to where the users background will load (which it does at the login" 
@@ -283,8 +293,7 @@ function change_login_screen {
 
 function change_desktop {
     printf "\033c"
-    echo "Adding Tux (in this case only his tuxedo's class) to your desktop/icon theme..."
-    echo ""
+    header "Adding tuxedo class to your DESKTOP"
     echo "Tux has scanned the web for the best themes and he likes:"
     echo "   - Arc Theme by horst3180 <https://github.com/horst3180/arc-theme>"
     echo "   - Paper Icon Theme at snwh.org <https://snwh.org/paper>"
@@ -390,9 +399,10 @@ function check_sudo {
     if sudo -n true 2>/dev/null; then 
         :
     else
-        echo "Tux will need sudo rights to copy and install everything, so he'll ask about that below."
         echo ""
-        read -n1 -r -p "Press any key to continue..." key
+        echo "Oh, and Tux will need sudo rights to copy and install everything, so he'll ask" 
+        echo "about that below."
+        echo ""
     fi
 }
 
@@ -411,6 +421,30 @@ function install_if_not_found {
     done
 }
 
+function change_grub2_theme { 
+    # Install grub2 theme
+    sudo cp -r tux-grub2-theme /boot/grub/themes/
+    sudo grep -q -F 'GRUB_THEME="' /etc/default/grub || sudo sh -c "echo 'GRUB_THEME="/boot/grub/themes/tux-grub2-theme/theme.txt"' >> /etc/default/grub"
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+    echo "Done";
+}
+
+# Some graphical functions
+function header {
+    var_size=${#1}
+    # 80 is a full width set by us (to work in the smallest standard terminal window)
+    # 80 - 2 - 1 = 77 to allow space for side lines and the first space after border.
+    len=$(expr 77 - $var_size)
+    ch=' '
+    echo "╔══════════════════════════════════════════════════════════════════════════════╗"
+    printf "║"
+    printf " $1"
+    printf '%*s' "$len" | tr ' ' "$ch"
+    printf "║\n"
+    echo "╚══════════════════════════════════════════════════════════════════════════════╝"
+    echo ""
+}
+
 while :
 do
     clear
@@ -425,7 +459,7 @@ do
 ║                                                                              ║
 ║   1) Everywhere                                - Install all of the below    ║
 ║   ------------------------------------------------------------------------   ║
-║   2) Boot Loader                               - Install rEFInd theme        ║
+║   2) Boot Loader                               - Themes OS selection at boot ║
 ║   3) Boot Logo                                 - Install Plymouth theme      ║
 ║   4) Login Screen                              - Remove grid and wallpaper   ║
 ║   5) Desktop Theme/Icons/Fonts + Tux           - Some class to your desktop  ║
