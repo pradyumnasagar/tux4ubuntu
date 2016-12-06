@@ -85,8 +85,11 @@ function change_boot_loader {
     printf "\033c"
     header "Adding Tux to BOOT LOADER" "$1"
     echo "Do you understand that changing boot loader theme (and potentially the boot"
-    echo "loader as well) is not without risk? And we can't be hold responsible if"  
-    echo "you proceed. Our website and internet can help but nothing is 100% safe."
+    echo "loader as well) is not without risk and that we can't be hold responsible if"  
+    echo "you proceed? (Our website and internet can help but nothing is 100% safe)"
+    echo ""
+    echo "WARNING! Before you continue, we also strongly recommend to backup all your data"
+    echo ""
     check_sudo
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
@@ -97,6 +100,7 @@ function change_boot_loader {
                     if ! grep -q rodsmith/refind /etc/apt/sources.list /etc/apt/sources.list.d/*; then
                         # The rEFInd ppa is not registered. Ask if user wants it installed.
                         printf "\033c"
+                        header "Adding Tux to BOOT LOADER" "$1"
                         echo "EFI bootloader detected";
                         echo ""
                         echo "Your system is new enough to boot using EFI, but you're not running the more graphical"
@@ -109,6 +113,7 @@ function change_boot_loader {
                         select yn in "Yes" "No"; do
                             case $yn in
                                 Yes ) printf "\033c"
+                                    header "Adding Tux to BOOT LOADER" "$1"
                                     # Commands to add the ppa
                                     sudo apt-add-repository ppa:rodsmith/refind
                                     sudo apt-get update
@@ -117,17 +122,19 @@ function change_boot_loader {
                                     echo "Done";
                                     break;;
                                 No ) printf "\033c"
-                                    # Let the user choose if they want to install Grub2 theme instead
+                                    header "Adding Tux to BOOT LOADER" "$1"
+                                    # Let the user choose if they want to install GRUB2 theme instead
                                     echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
                                     echo ""
-                                    echo "However, Tux can also customize your GRUB 2 theme. Want to try?"
+                                    echo "However, Tux can also customize your GRUB2 theme. Want to try?"
                                     select yn in "Yes" "No"; do
                                         case $yn in
                                             Yes ) printf "\033c"
-                                                printf "\033c"
+                                                header "Adding Tux to BOOT LOADER" "$1"
                                                 change_grub2_theme
                                                 break;;
                                             No ) printf "\033c"
+                                                header "Adding Tux to BOOT LOADER" "$1"
                                                 echo "'Come back when you're ready, I'll be waiting here' says Tux."
                                                 break;;
                                         esac
@@ -136,57 +143,69 @@ function change_boot_loader {
                         done
                     else
                         printf "\033c"
+                        header "Adding Tux to BOOT LOADER" "$1"
                         echo "Seems like you have rEFInd installed."
                     fi
                     printf "\033c"
+                    header "Adding Tux to BOOT LOADER" "$1"
                     echo "Initiating to copy folder tux-refind-theme."
                     sudo mkdir -p /boot/efi/EFI/refind/themes
                     sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
                     echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf                        
                 else 
-                    echo "BIOS boot noticed. If you're running a newer system that support EFI, check"
-                    echo "out your BIOS settings (switching from Legacy to UEFI/EFI might do the trick"
-                    echo "and will enable a lot more customization to your boot loader."
+                    header "Adding Tux to BOOT LOADER" "$1"
+                    echo "BIOS boot noticed."
+                    echo ""
+                    echo "If you're running a newer system that support EFI, check your BIOS settings."
+                    echo "Switching from Legacy to UEFI/EFI might do the trick and will enable a lot"
+                    echo "more customization to your boot loader."
                     echo ""
                     echo "If you're running an older system (or maybe you're running a virtual machine)"
-                    echo "Tux can customize the BIOS capable grub2 loader a little as well. Want to try?";
+                    echo "Tux can customize the BIOS capable GRUB2 loader a little as well. Want to try?";
+                    echo ""
                     select yn in "Yes" "No"; do
                         case $yn in
                             Yes ) printf "\033c"
-
+                                header "Adding Tux to BOOT LOADER" "$1"
+                                change_grub2_theme
+                                echo ""
+                                echo "Successfully themed your GRUB2 Boot Loader."
                                 break;;
                             No ) printf "\033c"
-                                echo "Tux stares at you with a curious look. Then he smiles and says 'Ok'."
+                                header "Adding Tux to BOOT LOADER" "$1"
+                                echo "Tux stares at you with a curious look... Then he smiles and says 'Ok'."
                                 break;;
                         esac
                     done
                 fi
-                printf "\033c"
-                echo "Boot Loader theme installed successfully!"
-                echo ""
-                read -n1 -r -p "Press any key to continue..." key
                 break;;
             No ) printf "\033c"
+                header "Adding Tux to BOOT LOADER" "$1"
                 echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
-                echo ""
-                read -n1 -r -p "Press any key to continue..." key
+
                 break;;
         esac
     done
+    echo ""
+    read -n1 -r -p "Press any key to continue..." key
 }
 
 function change_boot_logo {
     printf "\033c"
-    header "Addding Tux as BOOT LOGO"
+    header "Addding Tux as BOOT LOGO" "$1"
     echo "Do you understand that changing boot logo is not without risk and that we can't"  
-    echo "be hold responsible if you proceed. Our website and internet can help but"
-    echo "nothing is 100% safe."
+    echo "be hold responsible if you proceed? (Our website and internet can help but"
+    echo "nothing is 100% safe)"
+    echo ""
+    echo "And do you also agree that Tux can install apt-packages 'xclip' and plymouth-"
+    echo "themes' if not found since they are needed for the installation?"
     echo ""
     echo "(Type 1 or 2, then press ENTER)"            
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) 
                 printf "\033c"
+                header "Addding Tux as BOOT LOGO" "$1"
                 check_sudo
                 # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
                 # so instead of simply sudo cp -r tux-plymouth-theme/ $plymouth_dir/themes/tux-plymouth-theme we 
@@ -196,23 +215,7 @@ function change_boot_logo {
                 # -package to successfully copy the internals of tux.script, tux.plymouth to a copy of the plymouth-themes's
                 # 'script'-theme. To do this, we first check if xclip and plymouth-themes is installed, and if not, we ask the user if they
                 # are okey with installing them. As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
-                
-                # TODO: install_if_not_found plymouth-themes xclip
-                MISC="plymouth-themes xclip"
-                for pkg in $MISC; do
-                    if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
-                        echo -e "$pkg is already installed"
-                    else
-                        echo "Oops... Tux needs to use apt-get package $pkg to proceed."
-                        echo ""
-                        if sudo apt-get -qq install $pkg; then
-                            echo "Successfully installed $pkg"
-                        else
-                            echo "Error installing $pkg"
-                        fi        
-                    fi
-                done
-
+                install_if_not_found "plymouth-themes xclip"
 
                 # 2) Copy one of these themes, the theme called script.
                 sudo cp -r $plymouth_dir/themes/script $plymouth_dir/themes/tux-plymouth-theme;  
@@ -221,10 +224,10 @@ function change_boot_logo {
                 sudo cp -r tux-plymouth-theme/* $plymouth_dir/themes/tux-plymouth-theme;
                 
                 # 4) Copy the internals of our files to existing using xclip
-                xclip $plymouth_dir/themes/tux-plymouth-theme/tux.script;
+                sudo xclip $plymouth_dir/themes/tux-plymouth-theme/tux.script;
                 sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.script';
                 xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.script;
-                xclip $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
+                sudo xclip $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
                 sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.plymouth';
                 xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.plymouth;                          
                 
@@ -239,31 +242,32 @@ function change_boot_logo {
                 # Then we can add it to default.plymouth and update update-initramfs accordingly
                 sudo update-alternatives --install $plymouth_dir/themes/default.plymouth default.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth 100;
                 printf "\033c"
-                echo "Below you will see a list with all themes available to choose tux in the Plymouth menu next (if you want Tux that is ;)";
+                header "Addding Tux as BOOT LOGO" "$1"
+                echo "Below you will see a list with all themes available to choose tux in the "
+                echo "Plymouth menu next (if you want Tux that is ;)";
                 echo ""
                 read -n1 -r -p "Press any key to continue..." key
                 sudo update-alternatives --config default.plymouth;
-                printf "\033c"
                 echo "Updating initramfs. This could take a while."
                 sudo update-initramfs -u;
                 printf "\033c"
+                header "Addding Tux as BOOT LOGO" "$1"
                 echo "Tux successfully moved in as your new Boot Logo."
-                echo ""
-                read -n1 -r -p "Press any key to continue..." key
                 break;;
             No )
                 printf "\033c"
+                header "Addding Tux as BOOT LOGO" "$1"
                 echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
-                echo ""
-                read -n1 -r -p "Press any key to continue..." key
             break;;
         esac
     done
+    echo ""
+    read -n1 -r -p "Press any key to continue..." key
 }
 
 function change_login_screen {
     printf "\033c"
-    header "Adding tuxedo class to your LOGIN SCREEN"
+    header "Adding tuxedo class to your LOGIN SCREEN" "$1"
     echo "This will disable the standard Ubuntu background and the grid with dots on your"
     echo "login screen. By doing this the background will stay black all the way from the"
     echo "boot loader to where the users background will load (which it does at the login" 
@@ -285,20 +289,22 @@ function change_login_screen {
                 # Now we can remove the script from tmp
                 sudo rm /tmp/tux-login-gsettings.sh
                 printf "\033c"
+                header "Adding tuxedo class to your LOGIN SCREEN" "$1"
                 echo "Successfully tuxedoed up your Login Screen."
-                echo ""
-                read -n1 -r -p "Press any key to continue..." key
                 break;;
             No ) printf "\033c"
-                echo "Tux stares at you with a curious look. Then he smiles and says 'Ok'."
+                header "Adding tuxedo class to your LOGIN SCREEN" "$1"
+                echo "Tux stares at you with a curious look... Then he smiles and says 'Ok'."
                 break;;
         esac
     done
+    echo ""
+    read -n1 -r -p "Press any key to continue..." key
 }
 
 function change_desktop {
     printf "\033c"
-    header "Adding tuxedo class to your DESKTOP"
+    header "Adding tuxedo class to your DESKTOP" "$1"
     echo "Tux has scanned the web for the best themes and he likes:"
     echo "   - Arc Theme by horst3180 <https://github.com/horst3180/arc-theme>"
     echo "   - Paper Icon Theme at snwh.org <https://snwh.org/paper>"
@@ -314,45 +320,28 @@ function change_desktop {
         case $yn in
             Yes ) 
                 printf "\033c"
-                echo "Starting add these packages..."
+                header "Adding tuxedo class to your DESKTOP" "$1"
+                echo "Installing packages..."
                 check_sudo
                 # Check if ppa's exists, otherwise add them
                 arc_ppa_added=false
-                any_ppa_added=false
                 if grep -q Horst3180 /etc/apt/sources.list /etc/apt/sources.list.d/*; then
                     echo "Horst3180 already added to ppa."
                 else
-                    printf "\033c"
                     echo "Adding Horst3180/arc-theme to ppa."
                     sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
-                    $arc_ppa_added=true
-                    $any_ppa_added=true
+                    arc_ppa_added=true
                 fi
                 if grep -q snwh/pulp /etc/apt/sources.list /etc/apt/sources.list.d/*; then
                     echo "snwh/pulp already added to ppa."
                 else
-                    printf "\033c"
                     echo "Adding snwh/pulp to ppa."
                     sudo add-apt-repository ppa:snwh/pulp
-                    $any_ppa_added=true
                 fi
                 # Update apt-get
-                if [ "$any_ppa_added" = true ]; then
-                    sudo apt-get update
-                fi
+                sudo apt-get update
                 # Install packages
-                MISC="arc-theme paper-icon-theme paper-gtk-theme paper-cursor-theme unity-tweak-tool"
-                for pkg in $MISC; do
-                    if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
-                        echo -e "$pkg is already installed"
-                    else
-                        if sudo apt-get -qq install $pkg; then
-                            echo "Successfully installed $pkg"
-                        else
-                            echo "Error installing $pkg"
-                        fi        
-                    fi
-                done
+                install_if_not_found "arc-theme paper-icon-theme paper-gtk-theme paper-cursor-theme unity-tweak-tool"
                 # Add release keys where apt-key support it
                 if [ "$arc_ppa_added" = true ]; then
                     arc_temp_dir=$(mktemp -d)
@@ -373,7 +362,7 @@ function change_desktop {
                     fc-cache -f -v
                 fi
                 # Copy an image of Tux to be your default launcher icon
-                sudo cp /media/joe/Projects/Tux4Ubuntu/src/tux-icon-theme/launcher_bfb.png /usr/share/unity/icons/
+                sudo cp tux-icon-theme/launcher_bfb.png /usr/share/unity/icons/
                 printf "\033c"
                 echo "Successfully installed theme, icons and fonts (and Tux on your launcher)." 
                 echo "We'll open Unity Tweak Tool for you and there you can choose"
@@ -389,15 +378,15 @@ function change_desktop {
                 unity-tweak-tool -a
                 printf "\033c"
                 echo "Successfully added some theming options á la Tux."
-                sleep 1.8
                 break;;
             No ) printf "\033c"
-                echo "Tux stares at you with a curious look. Then he smiles and says 'Ok'."
-                echo ""
-                read -n1 -r -p "Press any key to continue..." key
+                header "Adding tuxedo class to your DESKTOP" "$1"
+                echo "Tux stares at you with a curious look... Then he smiles and says 'Ok'."
                 break;;
         esac
     done
+    echo ""
+    read -n1 -r -p "Press any key to continue..." key
 }
 
 function check_sudo {
@@ -428,10 +417,11 @@ function install_if_not_found {
 
 function change_grub2_theme { 
     # Install grub2 theme
+    echo "Copying tux-grub2-theme to /boot/grub/themes/"
     sudo cp -r tux-grub2-theme /boot/grub/themes/
+    echo "Adding 'GRUB_THEME=/boot/grub/themes/tux-grub2-theme/theme.txt' to '/etc/default/grub'"
     sudo grep -q -F 'GRUB_THEME="' /etc/default/grub || sudo sh -c "echo 'GRUB_THEME="/boot/grub/themes/tux-grub2-theme/theme.txt"' >> /etc/default/grub"
     sudo grub-mkconfig -o /boot/grub/grub.cfg
-    echo "Done";
 }
 
 function header {
@@ -495,9 +485,12 @@ EOF
             STEPCOUNTER=true
             i=1
             change_boot_loader $i
-            change_boot_logo
-            change_login_screen
-            change_desktop
+            ((i++))
+            change_boot_logo $i
+            ((i++))
+            change_login_screen $i
+            ((i++))
+            change_desktop $i
             ;;
     "2")    change_boot_loader ;;
     "3")    change_boot_logo ;;
