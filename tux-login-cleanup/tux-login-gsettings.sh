@@ -3,5 +3,4 @@
 # echo "$USER"
 gsettings set com.canonical.unity-greeter draw-grid false
 gsettings set com.canonical.unity-greeter background-color “#000000”
-gsettings set com.canonical.unity-greeter background-logo "/usr/share/unity-greeter/cof_tux.png"
 gsettings set com.canonical.unity-greeter background ""

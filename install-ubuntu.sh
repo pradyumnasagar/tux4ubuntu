@@ -307,7 +307,7 @@ function change_desktop {
     header "Adding tuxedo class to your DESKTOP" "$1"
     echo "Tux has scanned the web for the best themes and he likes:"
     echo "   - Arc Theme by horst3180 <https://github.com/horst3180/arc-theme>"
-    echo "   - Paper Icon Theme at snwh.org <https://snwh.org/paper>"
+    echo "   - Paper Icon & Cursor Theme at snwh.org <https://snwh.org/paper>"
     echo "   - Roboto Font by Google <https://www.fontsquirrel.com/fonts/roboto>"
     echo ""
     echo "He plans to install these and 'Unity Tweak Tool' (if non of these are installed"
@@ -325,51 +325,56 @@ function change_desktop {
                 check_sudo
                 # Check if ppa's exists, otherwise add them
                 arc_ppa_added=false
-                if grep -q Horst3180 /etc/apt/sources.list /etc/apt/sources.list.d/*; then
-                    echo "Horst3180 already added to ppa."
-                else
-                    echo "Adding Horst3180/arc-theme to ppa."
+                if [ ! -f /etc/apt/sources.list.d/arc-theme.list ]; then
+                    echo "/etc/apt/sources.list.d/arc-theme.list not found, adding it now."
                     sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
                     arc_ppa_added=true
-                fi
-                if grep -q snwh/pulp /etc/apt/sources.list /etc/apt/sources.list.d/*; then
-                    echo "snwh/pulp already added to ppa."
-                else
-                    echo "Adding snwh/pulp to ppa."
-                    sudo add-apt-repository ppa:snwh/pulp
-                fi
-                # Update apt-get
-                sudo apt-get update
-                # Install packages
-                install_if_not_found "arc-theme paper-icon-theme paper-gtk-theme paper-cursor-theme unity-tweak-tool"
-                # Add release keys where apt-key support it
-                if [ "$arc_ppa_added" = true ]; then
+                    echo "arc-theme's Release.key is being installed to get secure downloads and updates"
                     arc_temp_dir=$(mktemp -d)
                     wget -O $arc_temp_dir/Release.key http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
                     sudo apt-key add - < $arc_temp_dir/Release.key
                 fi
+                if grep -q snwh/pulp /etc/apt/sources.list /etc/apt/sources.list.d/*; then
+                    echo "snwh/pulp already added to ppa."
+                else
+                    echo "Adds snwh/pulp to ppa."
+                    sudo add-apt-repository ppa:snwh/pulp
+                fi
+                # Update apt-get
+                echo "Tux will now update your apt-get lists before install (which may take a while)."
+                echo ""
+                read -n1 -r -p "Press any key to continue..." key
+                sudo apt-get update
+                # Install packages
+                install_if_not_found "arc-theme paper-icon-theme paper-gtk-theme paper-cursor-theme unity-tweak-tool"
                 # Download and install Roboto Fonts (as described here: https://wiki.ubuntu.com/Fonts)
                 if fc-list | grep -i roboto >/dev/null; then
                     echo "Roboto fonts already installed"
                 else
-                    echo "Installing Roboto fonts by Google"
+                    echo "Installing Roboto fonts by Google."
                     roboto_temp_dir=$(mktemp -d)
                     wget -O $roboto_temp_dir/roboto.zip https://www.fontsquirrel.com/fonts/download/roboto
                     unzip $roboto_temp_dir/roboto.zip -d $roboto_temp_dir
                     sudo mkdir -p ~/.fonts
                     sudo cp $roboto_temp_dir/*.ttf ~/.fonts/
-                    printf "Updating font cache (may take a while)"
+                    echo "Successfully installed Roboto Font by Google."
+                    echo ""
+                    echo "Tux will now update your font cache (may take a while)"
+                    echo ""
+                    read -n1 -r -p "Press any key to continue..." key
                     fc-cache -f -v
                 fi
                 # Copy an image of Tux to be your default launcher icon
                 sudo cp tux-icon-theme/launcher_bfb.png /usr/share/unity/icons/
                 printf "\033c"
-                echo "Successfully installed theme, icons and fonts (and Tux on your launcher)." 
+                header "Adding tuxedo class to your DESKTOP" "$1"
+                echo "Installed theme, icons, cursors and fonts (and Tux on your launcher)." 
                 echo "We'll open Unity Tweak Tool for you and there you can choose"
-                echo "(which is suggested by Tux):"
+                echo "(as suggested by Tux):"
                 echo ""
                 echo "Under Themes      ->      Choose 'Arc'"
                 echo "Under Icons       ->      Choose 'Paper'"
+                echo "Under Cursors     ->      Choose 'Paper'"
                 echo "Under Fonts       ->      Default Font -> 'Roboto Regular'"
                 echo "                          Window Title Font -> 'Roboto Black'"
                 echo ""
@@ -377,7 +382,10 @@ function change_desktop {
                 read -n1 -r -p "Press any key to open Unity Tweak Tool..." key
                 unity-tweak-tool -a
                 printf "\033c"
-                echo "Successfully added some theming options á la Tux."
+                header "Adding tuxedo class to your DESKTOP" "$1"
+                echo "Successfully added some theming options á la Tux. It's highly recommended to reboot soon to make everything look properly (especially regarding the Arc-theme)."
+                echo ""
+                echo "(However, it's still safe to continue installation)"
                 break;;
             No ) printf "\033c"
                 header "Adding tuxedo class to your DESKTOP" "$1"
@@ -393,9 +401,8 @@ function check_sudo {
     if sudo -n true 2>/dev/null; then 
         :
     else
-        echo ""
         echo "Oh, and Tux will need sudo rights to copy and install everything, so he'll ask" 
-        echo "about that below."
+        echo "about that soon."
         echo ""
     fi
 }
@@ -406,6 +413,7 @@ function install_if_not_found {
         if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
             echo -e "$pkg is already installed"
         else
+            echo "Installing $pkg."
             if sudo apt-get -qq install $pkg; then
                 echo "Successfully installed $pkg"
             else
@@ -435,7 +443,6 @@ function header {
         # 80 - 2 - 1 - 9 = 68 to allow space for side lines and the first space after border.
         len=$(expr 68 - $var_size)
     fi
-
     ch=' '
     echo "╔══════════════════════════════════════════════════════════════════════════════╗"
     printf "║"
@@ -448,7 +455,6 @@ function header {
     printf "║\n"
     echo "╚══════════════════════════════════════════════════════════════════════════════╝"
     echo ""
-
 }
 
 while :
@@ -468,7 +474,7 @@ do
 ║   2) Boot Loader                               - Themes OS selection at boot ║
 ║   3) Boot Logo                                 - Install Plymouth theme      ║
 ║   4) Login Screen                              - Remove grid and wallpaper   ║
-║   5) Desktop Theme/Icons/Fonts + Tux           - Some class to your desktop  ║
+║   5) Desktop Theme/Icons/Cursors/Fonts + Tux   - Some class to your desktop  ║
 ║   6) Wallpapers                                - Adds Tux favourite images   ║
 ║   7) Games                                     - Install games feat. Tux     ║
 ║   8) On my belly!                              - Buy the t-shirt             ║
@@ -496,8 +502,7 @@ EOF
     "3")    change_boot_logo ;;
     "4")    change_login_screen ;;
     "5")    change_desktop ;;
-    "6")    # Wallpaper 
-            ;;
+    "6")    change_wallpaper ;;
     "7")    # Games
             ;;
     "8")    # Buy the t-shirt
