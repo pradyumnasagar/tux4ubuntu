@@ -30,11 +30,16 @@
 #
 # For CREDITS AND ATTRIBUTION see README 
 
+# Change directory to same as script is running in
 cd "$(dirname "$0")"
+# Adds error handling by exiting at first error
 set -e
+# Cleans the screen
 printf "\033c"
+# Set global values
+STEPCOUNTER=false # Sets to true if user choose to install Tux Everywhere
 
-# Here we change paths that are OS version dependant
+# Here we check if OS is supported
 # More info on other OSes regarding plymouth: http://brej.org/blog/?p=158
 if [[ `lsb_release -rs` == "16.04" ]]
 then
@@ -78,7 +83,7 @@ fi
 
 function change_boot_loader { 
     printf "\033c"
-    header "Adding Tux to BOOT LOADER"
+    header "Adding Tux to BOOT LOADER" "$1"
     echo "Do you understand that changing boot loader theme (and potentially the boot"
     echo "loader as well) is not without risk? And we can't be hold responsible if"  
     echo "you proceed. Our website and internet can help but nothing is 100% safe."
@@ -429,20 +434,31 @@ function change_grub2_theme {
     echo "Done";
 }
 
-# Some graphical functions
 function header {
     var_size=${#1}
     # 80 is a full width set by us (to work in the smallest standard terminal window)
-    # 80 - 2 - 1 = 77 to allow space for side lines and the first space after border.
-    len=$(expr 77 - $var_size)
+    if [ $STEPCOUNTER = false ]; then
+        # 80 - 2 - 1 = 77 to allow space for side lines and the first space after border.
+        len=$(expr 77 - $var_size)
+    else   
+        # "Step X/X " is 9
+        # 80 - 2 - 1 - 9 = 68 to allow space for side lines and the first space after border.
+        len=$(expr 68 - $var_size)
+    fi
+
     ch=' '
     echo "╔══════════════════════════════════════════════════════════════════════════════╗"
     printf "║"
     printf " $1"
     printf '%*s' "$len" | tr ' ' "$ch"
+    if [ $STEPCOUNTER = true ]; then
+        printf "Step "$2
+        printf "/7 "
+    fi
     printf "║\n"
     echo "╚══════════════════════════════════════════════════════════════════════════════╝"
     echo ""
+
 }
 
 while :
@@ -476,7 +492,9 @@ EOF
     read -n1 -s
     case "$REPLY" in
     "1")    # Install everything
-            change_boot_loader
+            STEPCOUNTER=true
+            i=1
+            change_boot_loader $i
             change_boot_logo
             change_login_screen
             change_desktop
