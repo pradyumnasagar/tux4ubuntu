@@ -411,16 +411,17 @@ function install_games {
     echo "  - FreedroidRPG                      (Sci-fi isometric role playing)"
     echo "  - WarMUX                            (A lot like Worms)"
     echo ""
+    check_sudo
     echo "Ready to try some gaming with The Tux!?"
     echo ""
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) 
-                echo "Initiating Tux Games install..."
-                install_if_not_found "supertux supertuxkart extremetuxracer freedroidrpg warmux"
                 printf "\033c"
                 header "Adding Tux GAMES" "$1"
+                echo "Initiating Tux Games install..."
+                install_if_not_found "supertux supertuxkart extremetuxracer freedroidrpg warmux"
                 echo "Successfully installed the Tux Games."
                 break;;
             No ) printf "\033c"
@@ -435,7 +436,30 @@ function install_games {
 }
 
 function get_the_tshirt {
-    echo "get_the_tshirt"
+    printf "\033c"
+    header "Get the T-SHIRT" "$1"
+    echo "Installed everything? Then it's time to spread the word!"
+    echo "And if you're interested, we have some cool t-shirts with Tux on them."
+    echo ""
+    echo "Want to check them out?"
+    echo ""
+    echo "(Type 1 or 2, then press ENTER)"
+    select yn in "Yes" "No"; do
+        case $yn in
+            Yes ) 
+                printf "\033c"
+                header "Get the T-SHIRT" "$1"
+                echo "Launching website in your favourite browser."
+                x-www-browser http://tux4ubuntu.blogspot.se/2016/11/done.html;
+                break;;
+            No ) printf "\033c"
+                header "Get the T-SHIRT" "$1"
+                echo "Check out tux4ubuntu.blogspot.com if you change your mind."
+                break;;
+        esac
+    done
+    echo ""
+    read -n1 -r -p "Press any key to continue..." key
 }
 
 function uninstall {
@@ -557,4 +581,3 @@ EOF
     esac
     sleep 1
 done
-x-www-browser http://tux4ubuntu.blogspot.se/2016/11/done.html;
