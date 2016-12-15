@@ -398,7 +398,51 @@ function change_desktop {
 }
 
 function change_wallpaper {
-    echo "wallpaper"
+    printf "\033c"
+    header "Adding Tux's WALLPAPER COLLECTION" "$1"
+    gh_repo="tux4ubuntu-wallpapers"
+    echo "This will download Tux 4K wallpapers selection (400+ mb)."
+    echo "Ready to do this?"
+    echo ""
+    echo "(Type 1 or 2, then press ENTER)"
+    select yn in "Yes" "No"; do
+        case $yn in
+            Yes ) 
+                echo "Initiating download..."
+                check_sudo
+                # To configure dconf we need to run as su, and then lightdm. 
+                # But first we put it in tmp for easier access
+                gh_repo="tux4ubuntu-wallpapers"
+                temp_dir=$(mktemp -d)
+                echo "=> Getting the latest version from GitHub ..."
+                wget -O "/tmp/$gh_repo.tar.gz" \
+                https://github.com/tuxedojoe/$gh_repo/archive/master.tar.gz
+                echo "=> Unpacking archive ..."
+                sudo tar -xzf "/tmp/$gh_repo.tar.gz" -C /tmp
+                sudo chmod -R ug+rw /tmp/tux4ubuntu-wallpapers-master/*
+                sudo mv /tmp/tux4ubuntu-wallpapers-master/* ~/Pictures
+                sudo chown -R $USER: $HOME
+                printf "\033c"
+                header "Adding Tux's WALLPAPER COLLECTION" "$1"
+                echo "Finished downloading and adding wallpapers. They are now available if you"
+                echo "select 'Pictures Folder' in 'System Settings' -> 'Appearance'."
+                echo ""
+                echo "IMPORTANT: Close 'System Settings' to continue installation."
+                echo ""
+                read -n1 -r -p "Press any key to open settings right now..." key
+                unity-control-center appearance
+                printf "\033c"
+                header "Adding Tux's WALLPAPER COLLECTION" "$1"
+                echo "Successfully tuxedoed up your Login Screen."
+                break;;
+            No ) printf "\033c"
+                header "Adding Tux's WALLPAPER COLLECTION" "$1"
+                echo "Tux stares at you with a curious look... Then he smiles and says 'Ok'."
+                break;;
+        esac
+    done
+    echo ""
+    read -n1 -r -p "Press any key to continue..." key
 }
 
 function install_games {
