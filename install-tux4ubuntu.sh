@@ -376,10 +376,10 @@ function change_desktop {
                 echo "We'll open Unity Tweak Tool for you and there you can choose"
                 echo "(as suggested by Tux):"
                 echo ""
-                echo "Under Themes      ->      Choose 'Arc'"
-                echo "Under Icons       ->      Choose 'Paper'"
-                echo "Under Cursors     ->      Choose 'Paper'"
-                echo "Under Fonts       ->      Default Font -> 'Roboto Regular'"
+                echo "1. Under Themes      ->      Choose 'Arc'"
+                echo "2. Under Icons       ->      Choose 'Paper'"
+                echo "3. Under Cursors     ->      Choose 'Paper'"
+                echo "4. Under Fonts       ->      Default Font -> 'Roboto Regular'"
                 echo "                          Window Title Font -> 'Roboto Black'"
                 echo ""
                 echo "IMPORTANT: Close Unity Tweak Tool to continue installation."
@@ -408,14 +408,18 @@ function change_wallpaper {
     echo "This will download Tux 4K wallpapers selection (400+ mb)."
     echo "Ready to do this?"
     echo ""
+    check_sudo
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) 
                 echo "Initiating download..."
-                check_sudo
+                
                 # To configure dconf we need to run as su, and then lightdm. 
                 # But first we put it in tmp for easier access
+                
+                # Uncomment this and comment the other for faster downloading when developing
+                #gh_repo="tux4ubuntu"
                 gh_repo="tux4ubuntu-wallpapers"
                 temp_dir=$(mktemp -d)
                 echo "=> Getting the latest version from GitHub ..."
@@ -423,21 +427,27 @@ function change_wallpaper {
                 https://github.com/tuxedojoe/$gh_repo/archive/master.tar.gz
                 echo "=> Unpacking archive ..."
                 sudo tar -xzf "/tmp/$gh_repo.tar.gz" -C /tmp
-                sudo chmod -R ug+rw /tmp/tux4ubuntu-wallpapers-master/*
-                sudo mv /tmp/tux4ubuntu-wallpapers-master/* ~/Pictures
+                sudo chmod -R ug+rw /tmp/$gh_repo-master/*
+                mkdir -p ~/Pictures/"Tux4Ubuntu Wallpapers"
+                sudo mv /tmp/$gh_repo-master/* ~/Pictures/"Tux4Ubuntu Wallpapers"
                 sudo chown -R $USER: $HOME
                 printf "\033c"
                 header "Adding Tux's WALLPAPER COLLECTION" "$1"
-                echo "Finished downloading and adding wallpapers. They are now available if you"
-                echo "select 'Pictures Folder' in 'System Settings' -> 'Appearance'."
+                echo "Finished downloading and adding wallpapers."
                 echo ""
-                echo "IMPORTANT: Close 'System Settings' to continue installation."
+                echo "Once you press any key 'Appearance'-settings will open, then it's up to you to:"
+                echo "1. Click '+'"
+                echo "2. Double-click on 'Tux4Ubuntu Wallpapers'"
+                echo "3. Find a wallpaper of choice"
+                echo "4. Click 'Open'"
+                echo ""
+                echo "IMPORTANT: Close the 'Appearance'-window to continue installation."
                 echo ""
                 read -n1 -r -p "Press any key to open settings right now..." key
                 unity-control-center appearance
                 printf "\033c"
                 header "Adding Tux's WALLPAPER COLLECTION" "$1"
-                echo "Successfully tuxedoed up your Login Screen."
+                echo "Successfully added Tux's selection of wallpapers."
                 break;;
             No ) printf "\033c"
                 header "Adding Tux's WALLPAPER COLLECTION" "$1"
@@ -565,7 +575,7 @@ EOF
         "6")    uninstall_wallpaper ;;
         "7")    uninstall_games ;;
         "8")    return_the_tshirt ;;
-        "9")    uninstall ;;
+        "9")    break ;;
         "Q")    exit                      ;;
         "q")    exit                      ;;
         * )    echo "invalid option"     ;;
@@ -603,8 +613,9 @@ function uninstall_boot_loader {
                                 Yes ) printf "\033c"
                                     header "Removing Tux in BOOT LOADER" "$1"
                                     # BEGIN HERE
-                                    # sudo grep -q -F 'include themes/tux-refind-theme/theme.conf' /boot/efi/EFI/refind/refind.conf || echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf
-                                    # sed '/pattern to match/d' ./infile
+                                    # sudo grep -q -F 'include themes/tux-refind-theme/theme.conf' /boot/efi/EFI/refind/refind.conf || sed '/pattern to match/d' ./infile
+                                    echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf
+                                    # 
                                     sudo rm -r /efi/EFI/boot/refind/themes/tux-refind-theme
                                     uninstall_if_found "refind"
                                     # Commands to remove the ppa
