@@ -508,7 +508,7 @@ function get_the_tshirt {
                 printf "\033c"
                 header "Get the T-SHIRT" "$1"
                 echo "Launching website in your favourite browser."
-                x-www-browser http://tux4ubuntu.blogspot.se/2016/11/done.html;
+                x-www-browser https://shop.spreadshirt.com/tux4ubuntu/;
                 break;;
             No ) printf "\033c"
                 header "Get the T-SHIRT" "$1"
@@ -516,6 +516,24 @@ function get_the_tshirt {
                 break;;
         esac
     done
+    echo ""
+    read -n1 -r -p "Press any key to continue..." key
+}
+
+function temp_uninstall {
+    printf "\033c"
+    header "UNINSTALLING Tux" "$1"
+    echo "We're working on it! See/help at http://github.com/tuxedojoe/tux4ubuntu"
+    echo ""
+    echo "But for now, check out the website under corresponding subjects. For instance"
+    echo "on 'Tux Boot Loader Theme for Ubuntu' you'll reverse instructions on how to"
+    echo "uninstall it."
+    echo ""
+    read -n1 -r -p "Press any key to open website..." key
+    printf "\033c"
+    header "UNINSTALLING Tux" "$1"
+    echo "Launching website in your favourite browser."
+    x-www-browser https://tux4ubuntu.blogspot.com/;
     echo ""
     read -n1 -r -p "Press any key to continue..." key
 }
@@ -625,8 +643,7 @@ function uninstall_boot_loader {
                                     header "Removing Tux to BOOT LOADER" "$1"
                                     # Let the user choose if they want to install GRUB2 theme instead
                                     echo "Ok, rEFInd will be spared but Tux removed."
-                                    sudo rm -r /efi/EFI/boot/refind/themes/tux-refind-theme
-                                    
+                                    sudo rm -r /efi/EFI/boot/refind/themes/tux-refind-theme                                    
                             esac
                         done
                     else
@@ -1132,7 +1149,7 @@ EOF
     "6")    change_wallpaper ;;
     "7")    install_games ;;
     "8")    get_the_tshirt ;;
-    "9")    uninstall ;;
+    "9")    temp_uninstall ;;
     "Q")    exit                      ;;
     "q")    exit                      ;;
      * )    echo "invalid option"     ;;
