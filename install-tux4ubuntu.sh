@@ -200,7 +200,7 @@ function change_boot_logo {
     echo ""
     echo "╔══════════════════════════════════════════════════════════════════════════════╗"
     echo "║ NOTE:       Because of a bug in Ubuntu desktop version the boot splash will  ║" 
-    echo "║             for show other info from fdisk at boot disrupting Tux splash.    ║"
+    echo "║             for show info from fdisk at boot disrupting Tux splash.          ║"
     echo "║                                                                              ║"
     echo "║ WORKAROUND: If possible install Ubuntu Server edition, and choose to install ║"
     echo "║             Desktop environment when asked. Or run the following command     ║"
