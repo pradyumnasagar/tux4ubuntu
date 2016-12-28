@@ -45,7 +45,7 @@ if [[ `lsb_release -rs` == "16.04" ]]
 then
     # The plymouth dir was moved in one update, therefore we have prepared for this one here
 	plymouth_dir="/usr/share/plymouth"
-elif [[ `lsb_release -rs` == "15.04" ]]
+elif [[ `lsb_release -rs` == "17.04" ]]
 then
 	plymouth_dir="/usr/share/plymouth"
 else
@@ -197,23 +197,21 @@ function change_boot_loader {
 function change_boot_logo {
     printf "\033c"
     header "Adding Tux as BOOT LOGO" "$1"
-    echo ""
     echo "╔══════════════════════════════════════════════════════════════════════════════╗"
-    echo "║ NOTE:       Because of a bug in Ubuntu desktop version the boot splash will  ║" 
-    echo "║             for show info from fdisk at boot disrupting Tux splash.          ║"
+    echo "║ NOTE:       Because of a bug in Ubuntu 16.04 Desktop version the boot splash ║" 
+    echo "║             will show info from fdisk at boot disrupting Tux splash.         ║"
     echo "║                                                                              ║"
-    echo "║ WORKAROUND: If possible install Ubuntu Server edition, and choose to install ║"
-    echo "║             Desktop environment when asked. Or run the following command     ║"
-    echo "║             after the installation:                                          ║"
+    echo "║ WORKAROUND: If possible install Ubuntu 16.04 Server edition and choose to    ║"
+    echo "║             install Desktop environment when asked. Or run the following     ║"
+    echo "║             command after the installation:                                          ║"
     echo "║             > sudo apt-get install ubuntu-desktop                            ║"
     echo "╚══════════════════════════════════════════════════════════════════════════════╝"
     echo ""
     echo "Do you understand that changing boot logo is not without risk and that we can't"  
     echo "be hold responsible if you proceed? (Our website and internet can help but"
-    echo "nothing is 100% safe)"
-    echo ""
-    echo "And do you also agree that Tux can install apt-packages 'xclip' and plymouth-"
-    echo "themes' if not found since they are needed for the installation?"
+    echo "nothing is 100% safe). And do you also agree that Tux will install apt-packages"
+    echo "'xclip' and 'plymouth-themes' if not found since they are needed for the"
+    echo "installation?"
     echo ""
     echo "(Type 1 or 2, then press ENTER)"            
     select yn in "Yes" "No"; do
