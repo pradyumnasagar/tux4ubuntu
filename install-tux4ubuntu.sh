@@ -1110,7 +1110,7 @@ do
     # Menu system as found here: http://stackoverflow.com/questions/20224862/bash-script-always-show-menu-after-loop-execution
     cat<<EOF    
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ TUX 4 UBUNTU                                    © 2016 Tux4Ubuntu Initiative ║
+║ TUX 4 UBUNTU ver 1.0                            © 2016 Tux4Ubuntu Initiative ║
 ║ Let's Bring Tux to Ubuntu                     http://tux4ubuntu.blogspot.com ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                              ║
