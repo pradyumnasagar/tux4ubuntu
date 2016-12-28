@@ -535,8 +535,9 @@ function temp_uninstall {
     echo "We're working on it! See/help at http://github.com/tuxedojoe/tux4ubuntu"
     echo ""
     echo "But for now, check out the website under corresponding subjects. For instance"
-    echo "on 'Tux Boot Loader Theme for Ubuntu' you'll reverse instructions on how to"
-    echo "uninstall it."
+    echo "on 'Tux Boot Loader Theme for Ubuntu' you'll find reverse instructions on how to"
+    echo "uninstall it. We're sad to see you go, and sorry for the unconvince for no "
+    echo "working uninstaller at the moment. But as we said, we're working on it."
     echo ""
     read -n1 -r -p "Press any key to open website..." key
     printf "\033c"
