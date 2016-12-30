@@ -437,8 +437,13 @@ function change_wallpaper {
                 echo "=> Unpacking archive ..."
                 sudo tar -xzf "/tmp/$gh_repo.tar.gz" -C /tmp
                 sudo chmod -R ug+rw /tmp/$gh_repo-master/*
-                mkdir -p ~/Pictures/"Tux4Ubuntu Wallpapers"
-                sudo mv /tmp/$gh_repo-master/* ~/Pictures/"Tux4Ubuntu Wallpapers"
+                # Add Pictures to locale folder
+                prefix="\$HOME/"                
+                pictures_var=$(cat $HOME/.config/user-dirs.dirs | grep "XDG_PICTURES_DIR")
+                pictures_folder_uncut=$(echo ${pictures_var/XDG_PICTURES_DIR=/""} | tr -d '"')
+                pictures_folder=${pictures_folder_uncut#$prefix}
+                mkdir -p ~/$pictures_folder/"Tux4Ubuntu Wallpapers"
+                sudo mv /tmp/$gh_repo-master/* ~/$pictures_folder/"Tux4Ubuntu Wallpapers"
                 sudo chown -R $USER: $HOME
                 printf "\033c"
                 header "Adding Tux's WALLPAPER COLLECTION" "$1"
@@ -556,7 +561,7 @@ function uninstall {
         RED='\033[0;31m'
         NC='\033[0m' # No Color
         printf "╔══════════════════════════════════════════════════════════════════════════════╗"
-        printf "║ TUX 4 UBUNTU - ${RED}UNINSTALL${NC}                        © 2016 Tux4Ubuntu Initiative ║\n"                       
+        printf "║ ${RED}TUX 4 UBUNTU - UNINSTALL${NC}                        © 2016 Tux4Ubuntu Initiative ║\n"                       
         printf "║ Let's Pause Tux a Bit                         http://tux4ubuntu.blogspot.com ║"
         printf "╠══════════════════════════════════════════════════════════════════════════════╣"
         cat<<EOF    
@@ -565,12 +570,12 @@ function uninstall {
 ║                                                                              ║
 ║   1) Everywhere                                - Uninstall all of the below  ║
 ║   ------------------------------------------------------------------------   ║
-║   2) Boot Loader*                              - Themes OS selection at boot ║
+║   2) *Boot Loader                              - Themes OS selection at boot ║
 ║   3) Boot Logo                                 - Remove Plymouth theme       ║
 ║   4) Login Screen                              - Add grid and wallpaper      ║
-║   5) Desktop Theme/Icons/Cursors/Fonts + Tux*  - Remove Tux desktop theming  ║
-║   6) Wallpapers*                                - Remove Tux favourite images║
-║   7) Games*                                     - Uninstall games feat. Tux  ║
+║   5) *Desktop Theme/Icons/Cursors/Fonts + Tux  - Remove Tux desktop theming  ║
+║   6) Wallpapers                                - Remove Tux favourite images ║
+║   7) Games                                     - Uninstall games feat. Tux   ║
 ║   * = Check back in 3 days and we have added it                              ║
 ║   ------------------------------------------------------------------------   ║
 ║   9) Back to installing Tux                    - Goes back to installer      ║
@@ -592,10 +597,10 @@ EOF
                 ((i++))
                 #uninstall_desktop $i
                 ((i++))
-                #uninstall_wallpaper $i
+                uninstall_wallpaper $i
                 ((i++))
-                #uninstall_games $i
-                ((i++))
+                uninstall_games $i
+                #((i++))
                 #return_the_tshirt $i
                 ;;
         "2")    uninstall_boot_loader ;;
@@ -607,16 +612,8 @@ EOF
                 echo ""
                 read -n1 -r -p "Press any key to continue..." key ;;
                 #uninstall_desktop ;;
-        "6")    printf "\033c"
-                echo "Come back in a couple of days and this works too... Sorry for the inconvenience."
-                # Coming soon
-                echo ""
-                read -n1 -r -p "Press any key to continue..." key ;;
-        "7")    printf "\033c"
-                echo "Come back in a couple of days and this works too... Sorry for the inconvenience."
-                # Coming soon
-                echo ""
-                read -n1 -r -p "Press any key to continue..." key ;;
+        "6")    uninstall_wallpaper ;;
+        "7")    uninstall_games ;;
         "8")    return_the_tshirt ;;
         "9")    break ;;
         "Q")    exit                      ;;
@@ -808,42 +805,24 @@ function uninstall_wallpaper {
     printf "\033c"
     header "Adding Tux's WALLPAPER COLLECTION" "$1"
     gh_repo="tux4ubuntu-wallpapers"
-    echo "This will download Tux 4K wallpapers selection (400+ mb)."
+    echo "This will remove all Tux 4K wallpapers."
     echo "Ready to do this?"
     echo ""
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) 
-                echo "Initiating download..."
-                check_sudo
-                # To configure dconf we need to run as su, and then lightdm. 
-                # But first we put it in tmp for easier access
-                gh_repo="tux4ubuntu-wallpapers"
-                temp_dir=$(mktemp -d)
-                echo "=> Getting the latest version from GitHub ..."
-                wget -O "/tmp/$gh_repo.tar.gz" \
-                https://github.com/tuxedojoe/$gh_repo/archive/master.tar.gz
-                echo "=> Unpacking archive ..."
-                sudo tar -xzf "/tmp/$gh_repo.tar.gz" -C /tmp
-                sudo chmod -R ug+rw /tmp/tux4ubuntu-wallpapers-master/*
+                echo "Starting to delete..."
                 # Added locale dependent Pictures folder
-                picturesVar=$(cat $HOME/.config/user-dirs.dirs | grep "XDG_PICTURES_DIR")
-                picturesFolder=$(echo ${picturesVar/XDG_DESKTOP_DIR=/""} | tr -d '"')
-                sudo mv /tmp/tux4ubuntu-wallpapers-master/* $picturesFolder
-                sudo chown -R $USER: $HOME
-                printf "\033c"
+                prefix="\$HOME/"                
+                pictures_var=$(cat $HOME/.config/user-dirs.dirs | grep "XDG_PICTURES_DIR")
+                pictures_folder_uncut=$(echo ${pictures_var/XDG_PICTURES_DIR=/""} | tr -d '"')
+                pictures_folder=${pictures_folder_uncut#$prefix}
+                sudo rm -rf ~/$pictures_folder/Tux4Ubuntu\ Wallpapers
+
+                #printf "\033c"
                 header "Adding Tux's WALLPAPER COLLECTION" "$1"
-                echo "Finished downloading and adding wallpapers. They are now available if you"
-                echo "select 'Pictures Folder' in 'System Settings' -> 'Appearance'."
-                echo ""
-                echo "IMPORTANT: Close 'System Settings' to continue installation."
-                echo ""
-                read -n1 -r -p "Press any key to open settings right now..." key
-                unity-control-center appearance
-                printf "\033c"
-                header "Adding Tux's WALLPAPER COLLECTION" "$1"
-                echo "Successfully tuxedoed up your Login Screen."
+                echo "Successfully removed the Tux's wallpapers."
                 break;;
             No ) printf "\033c"
                 header "Adding Tux's WALLPAPER COLLECTION" "$1"
@@ -858,15 +837,16 @@ function uninstall_wallpaper {
 function uninstall_games {
     printf "\033c"
     header "Adding Tux GAMES" "$1"
-    echo "This will install the following classic Tux games:"
+    echo "This will uninstall all the following classic Tux games:"
     echo "  - SuperTux                          (A lot like Super Mario)"
     echo "  - SuperTuxKart                      (A lot like Mario Kart)"
-    echo "  - Extreme Tux Racer                 (Help Tux slide down slopes)"
+    echo "  - ExtremeTuxRacer                   (Help Tux slide down slopes)"
     echo "  - FreedroidRPG                      (Sci-fi isometric role playing)"
     echo "  - WarMUX                            (A lot like Worms)"
     echo ""
     check_sudo
-    echo "Ready to try some gaming with The Tux!?"
+    echo "Ready to delete them all!? (if you want to uninstall only a specific game,"
+    echo "type: sudo apt-get remove 'the-game-name' and press ENTER in a terminal)"
     echo ""
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
@@ -874,9 +854,9 @@ function uninstall_games {
             Yes ) 
                 printf "\033c"
                 header "Adding Tux GAMES" "$1"
-                echo "Initiating Tux Games install..."
-                install_if_not_found "supertux supertuxkart extremetuxracer freedroidrpg warmux"
-                echo "Successfully installed the Tux Games."
+                echo "Initiating Tux Games uninstall..."
+                uninstall_if_found "supertux supertuxkart extremetuxracer freedroidrpg warmux"
+                echo "Successfully uninstalled the Tux Games."
                 break;;
             No ) printf "\033c"
                 header "Adding Tux GAMES" "$1"
@@ -947,7 +927,7 @@ function uninstall_if_found {
     for pkg in $1; do
         if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
             echo "Installing $pkg."
-            if sudo apt-get remove $pkg; then
+            if sudo apt-get -y remove $pkg; then
                 echo "Successfully uninstalled $pkg"
             else
                 echo "Error uninstalling $pkg"
