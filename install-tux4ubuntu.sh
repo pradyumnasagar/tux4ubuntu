@@ -943,7 +943,10 @@ function uninstall_wallpaper {
                 echo "=> Unpacking archive ..."
                 sudo tar -xzf "/tmp/$gh_repo.tar.gz" -C /tmp
                 sudo chmod -R ug+rw /tmp/tux4ubuntu-wallpapers-master/*
-                sudo mv /tmp/tux4ubuntu-wallpapers-master/* ~/Pictures
+                # Added locale dependent Pictures folder
+                picturesVar=$(cat $HOME/.config/user-dirs.dirs | grep "XDG_PICTURES_DIR")
+                picturesFolder=$(echo ${picturesVar/XDG_DESKTOP_DIR=/""} | tr -d '"')
+                sudo mv /tmp/tux4ubuntu-wallpapers-master/* $picturesFolder
                 sudo chown -R $USER: $HOME
                 printf "\033c"
                 header "Adding Tux's WALLPAPER COLLECTION" "$1"
