@@ -218,7 +218,7 @@ function change_boot_logo {
         case $yn in
             Yes ) 
                 printf "\033c"
-                header "Addding Tux as BOOT LOGO" "$1"
+                header "Adding Tux as BOOT LOGO" "$1"
                 check_sudo
                 # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
                 # so instead of simply sudo cp -r tux-plymouth-theme/ $plymouth_dir/themes/tux-plymouth-theme we 
@@ -255,7 +255,7 @@ function change_boot_logo {
                 # Then we can add it to default.plymouth and update update-initramfs accordingly
                 sudo update-alternatives --install $plymouth_dir/themes/default.plymouth default.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth 100;
                 printf "\033c"
-                header "Addding Tux as BOOT LOGO" "$1"
+                header "Adding Tux as BOOT LOGO" "$1"
                 echo "Below you will see a list with all themes available to choose tux in the "
                 echo "Plymouth menu next (if you want Tux that is ;)";
                 echo ""
@@ -264,12 +264,12 @@ function change_boot_logo {
                 echo "Updating initramfs. This could take a while."
                 sudo update-initramfs -u;
                 printf "\033c"
-                header "Addding Tux as BOOT LOGO" "$1"
+                header "Adding Tux as BOOT LOGO" "$1"
                 echo "Tux successfully moved in as your new Boot Logo."
                 break;;
             No )
                 printf "\033c"
-                header "Addding Tux as BOOT LOGO" "$1"
+                header "Adding Tux as BOOT LOGO" "$1"
                 echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
             break;;
         esac
@@ -614,173 +614,48 @@ EOF
 
 function uninstall_boot_loader { 
     printf "\033c"
-    header "Adding Tux to BOOT LOADER" "$1"
-    echo "Are you sure you really want to remove Tux from your boot logo?"
-    echo ""
-    echo "WARNING! Before you continue, we also strongly recommend to backup all your data"
-    echo ""
-    check_sudo
-    echo "(Type 1 or 2, then press ENTER)"
-    select yn in "Yes" "No"; do
-        case $yn in
-            Yes ) printf "\033c"
-                if [ -d /sys/firmware/efi ]
-                then 
-                    if grep -q rodsmith/refind /etc/apt/sources.list /etc/apt/sources.list.d/*; then
-                        # The rEFInd ppa is not registered. Ask if user wants it installed.
-                        printf "\033c"
-                        header "Adding Tux to BOOT LOADER" "$1"
-                        echo "EFI bootloader detected";
-                        echo ""
-                        echo "Your system is using EFI and you have rEFInd installed, do you want to remove that as well"
-                        echo "when removing Tux?"
-                        echo ""
-                        echo "(Type 1 or 2, then press ENTER)"
-                        select yn in "Yes" "No"; do
-                            case $yn in
-                                Yes ) printf "\033c"
-                                    header "Removing Tux in BOOT LOADER" "$1"
-                                    # BEGIN HERE
-                                    # sudo grep -q -F 'include themes/tux-refind-theme/theme.conf' /boot/efi/EFI/refind/refind.conf || sed '/pattern to match/d' ./infile
-                                    echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf
-                                    # 
-                                    sudo rm -r /efi/EFI/boot/refind/themes/tux-refind-theme
-                                    uninstall_if_found "refind"
-                                    # Commands to remove the ppa
-                                    sudo add-apt-repository --remove ppa:rodsmith/refind
-                                    break;;
-                                No ) printf "\033c"
-                                    header "Removing Tux to BOOT LOADER" "$1"
-                                    # Let the user choose if they want to install GRUB2 theme instead
-                                    echo "Ok, rEFInd will be spared but Tux removed."
-                                    sudo rm -r /efi/EFI/boot/refind/themes/tux-refind-theme                                    
-                            esac
-                        done
-                    else
-                        printf "\033c"
-                        header "Adding Tux to BOOT LOADER" "$1"
-                        echo "Seems like you don't have rEFInd. Trying to remove Tux from GRUB2 if found."
-                        uninstall_grub2_theme
-                    fi
-
-                    printf "\033c"
-                    header "Adding Tux to BOOT LOADER" "$1"
-                    echo "Initiating to copy folder tux-refind-theme."
-                    echo ""
-                    check_sudo
-                    sudo mkdir -p /boot/efi/EFI/refind/themes
-                    sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
-                    echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf                        
-                    echo ""
-                    printf "\033c"
-                    header "Adding Tux to BOOT LOADER" "$1"
-                    echo "Successfully copied 'tux-refind-theme' to your rEFInd themes folder."
-                else 
-                    header "Adding Tux to BOOT LOADER" "$1"
-                    echo "BIOS boot noticed."
-                    echo ""
-                    echo "If you're running a newer system that support EFI, check your BIOS settings."
-                    echo "Switching from Legacy to UEFI/EFI might do the trick and will enable a lot"
-                    echo "more customization to your boot loader."
-                    echo ""
-                    echo "If you're running an older system (or maybe you're running a virtual machine)"
-                    echo "Tux can customize the BIOS capable GRUB2 loader a little as well. Want to try?";
-                    echo ""
-                    select yn in "Yes" "No"; do
-                        case $yn in
-                            Yes ) printf "\033c"
-                                header "Adding Tux to BOOT LOADER" "$1"
-                                change_grub2_theme
-                                echo ""
-                                echo "Successfully themed your GRUB2 Boot Loader."
-                                break;;
-                            No ) printf "\033c"
-                                header "Adding Tux to BOOT LOADER" "$1"
-                                echo "Tux stares at you with a curious look... Then he smiles and says 'Ok'."
-                                break;;
-                        esac
-                    done
-                fi
-                break;;
-            No ) printf "\033c"
-                header "Adding Tux to BOOT LOADER" "$1"
-                echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
-
-                break;;
-        esac
-    done
+    echo "Come back in a couple of days and this works too... Sorry for the inconvenience."
+    # Coming soon
     echo ""
     read -n1 -r -p "Press any key to continue..." key
 }
 
 function uninstall_boot_logo {
     printf "\033c"
-    header "Addding Tux as BOOT LOGO" "$1"
-    echo "Do you understand that changing boot logo is not without risk and that we can't"  
-    echo "be hold responsible if you proceed? (Our website and internet can help but"
-    echo "nothing is 100% safe)"
-    echo ""
-    echo "And do you also agree that Tux can install apt-packages 'xclip' and plymouth-"
-    echo "themes' if not found since they are needed for the installation?"
+    header "Removing Tux as BOOT LOGO" "$1"
+    echo "Really sure you want to uninstall Tux as your boot logo?"
     echo ""
     echo "(Type 1 or 2, then press ENTER)"            
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) 
                 printf "\033c"
-                header "Addding Tux as BOOT LOGO" "$1"
-                check_sudo
-                # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
-                # so instead of simply sudo cp -r tux-plymouth-theme/ $plymouth_dir/themes/tux-plymouth-theme we 
-                # have to (6 steps):
-                    
-                # 1) Add other themes through the apt-get package 'plymouth-themes' that seem to work as well as 'xclip'
-                # -package to successfully copy the internals of tux.script, tux.plymouth to a copy of the plymouth-themes's
-                # 'script'-theme. To do this, we first check if xclip and plymouth-themes is installed, and if not, we ask the user if they
-                # are okey with installing them. As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
-                install_if_not_found "plymouth-themes xclip"
+                header "Uninstalling Tux as BOOT LOGO" "$1"
+                # uninstall_not_found "plymouth-themes xclip"
+                folder_to_delete=$plymouth_dir/themes/tux-plymouth-theme
 
-                # 2) Copy one of these themes, the theme called script.
-                sudo cp -r $plymouth_dir/themes/script $plymouth_dir/themes/tux-plymouth-theme;  
-                
-                # 3) Add tux-plymouth-theme files
-                sudo cp -r tux-plymouth-theme/* $plymouth_dir/themes/tux-plymouth-theme;
-                
-                # 4) Copy the internals of our files to existing using xclip
-                sudo xclip $plymouth_dir/themes/tux-plymouth-theme/tux.script;
-                sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.script';
-                xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.script;
-                sudo xclip $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
-                sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.plymouth';
-                xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.plymouth;                          
-                
-                # 5) Remove our own files
-                sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
-                sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.script;
-                
-                # 6) And rename the newly created copies
-                sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.script $plymouth_dir/themes/tux-plymouth-theme/tux.script
-                sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth
+                if [ -f $folder_to_delete ] ; then
+                    sudo rm -r $folder_to_delete
+                fi
 
-                # Then we can add it to default.plymouth and update update-initramfs accordingly
-                sudo update-alternatives --install $plymouth_dir/themes/default.plymouth default.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth 100;
+                
                 printf "\033c"
-                header "Addding Tux as BOOT LOGO" "$1"
-                echo "Below you will see a list with all themes available to choose tux in the "
-                echo "Plymouth menu next (if you want Tux that is ;)";
+                header "Removing Tux as BOOT LOGO" "$1"
+                echo "Below you will see a list with all themes available, choose a new theme to view"
+                echo "on boot when Tux is removed."
                 echo ""
                 read -n1 -r -p "Press any key to continue..." key
                 sudo update-alternatives --config default.plymouth;
                 echo "Updating initramfs. This could take a while."
                 sudo update-initramfs -u;
                 printf "\033c"
-                header "Addding Tux as BOOT LOGO" "$1"
-                echo "Tux successfully moved in as your new Boot Logo."
+                header "Removing Tux as BOOT LOGO" "$1"
+                echo "Tux is successfully removed from your boot."
                 break;;
             No )
                 printf "\033c"
-                header "Addding Tux as BOOT LOGO" "$1"
-                echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting."
+                header "Removing Tux as BOOT LOGO" "$1"
+                echo "Awesome! Tux smiles and gives you a pat on the shoulder."
             break;;
         esac
     done
@@ -1130,7 +1005,7 @@ do
 ║   7) Games                                     - Install games feat. Tux     ║
 ║   8) On my belly!                              - Buy the t-shirt             ║
 ║   ------------------------------------------------------------------------   ║
-║   9) Uninstall Tux                             - Uninstall the above         ║
+║   9) Uninstall Tux (partialy done)             - Uninstall the above         ║
 ║   ------------------------------------------------------------------------   ║
 ║   Q) I'm done                                  - Quit the installer (Ctrl+C) ║
 ║                                                                              ║
@@ -1162,7 +1037,7 @@ EOF
     "6")    change_wallpaper ;;
     "7")    install_games ;;
     "8")    get_the_tshirt ;;
-    "9")    temp_uninstall ;;
+    "9")    uninstall ;;
     "Q")    exit                      ;;
     "q")    exit                      ;;
      * )    echo "invalid option"     ;;
