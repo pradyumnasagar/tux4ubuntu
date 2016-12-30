@@ -565,13 +565,13 @@ function uninstall {
 ║                                                                              ║
 ║   1) Everywhere                                - Uninstall all of the below  ║
 ║   ------------------------------------------------------------------------   ║
-║   2) Boot Loader                               - Themes OS selection at boot ║
+║   2) Boot Loader*                              - Themes OS selection at boot ║
 ║   3) Boot Logo                                 - Remove Plymouth theme       ║
 ║   4) Login Screen                              - Add grid and wallpaper      ║
-║   5) Desktop Theme/Icons/Cursors/Fonts + Tux   - Remove Tux desktop theming  ║
-║   6) Wallpapers                                - Remove Tux favourite images ║
-║   7) Games                                     - Uninstall games feat. Tux   ║
-║   8) On my belly                               - Return the t-shirt          ║
+║   5) Desktop Theme/Icons/Cursors/Fonts + Tux*  - Remove Tux desktop theming  ║
+║   6) Wallpapers*                                - Remove Tux favourite images║
+║   7) Games*                                     - Uninstall games feat. Tux  ║
+║   * = Check back in 3 days and we have added it                              ║
 ║   ------------------------------------------------------------------------   ║
 ║   9) Back to installing Tux                    - Goes back to installer      ║
 ║   ------------------------------------------------------------------------   ║
@@ -584,26 +584,39 @@ EOF
         "1")    # Uninstall everything
                 STEPCOUNTER=true
                 i=1
-                uninstall_boot_loader $i
+                #uninstall_boot_loader $i
                 ((i++))
                 uninstall_boot_logo $i
                 ((i++))
                 uninstall_login_screen $i
                 ((i++))
-                uninstall_desktop $i
+                #uninstall_desktop $i
                 ((i++))
-                uninstall_wallpaper $i
+                #uninstall_wallpaper $i
                 ((i++))
-                uninstall_games $i
+                #uninstall_games $i
                 ((i++))
-                return_the_tshirt $i
+                #return_the_tshirt $i
                 ;;
         "2")    uninstall_boot_loader ;;
         "3")    uninstall_boot_logo ;;
         "4")    uninstall_login_screen ;;
-        "5")    uninstall_desktop ;;
-        "6")    uninstall_wallpaper ;;
-        "7")    uninstall_games ;;
+        "5")    printf "\033c"
+                echo "Come back in a couple of days and this works too... Sorry for the inconvenience."
+                # Coming soon
+                echo ""
+                read -n1 -r -p "Press any key to continue..." key ;;
+                #uninstall_desktop ;;
+        "6")    printf "\033c"
+                echo "Come back in a couple of days and this works too... Sorry for the inconvenience."
+                # Coming soon
+                echo ""
+                read -n1 -r -p "Press any key to continue..." key ;;
+        "7")    printf "\033c"
+                echo "Come back in a couple of days and this works too... Sorry for the inconvenience."
+                # Coming soon
+                echo ""
+                read -n1 -r -p "Press any key to continue..." key ;;
         "8")    return_the_tshirt ;;
         "9")    break ;;
         "Q")    exit                      ;;
