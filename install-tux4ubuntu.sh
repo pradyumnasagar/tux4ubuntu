@@ -553,11 +553,13 @@ function uninstall {
     do
         clear
         # Menu system as found here: http://stackoverflow.com/questions/20224862/bash-script-always-show-menu-after-loop-execution
+        RED='\033[0;31m'
+        NC='\033[0m' # No Color
+        printf "╔══════════════════════════════════════════════════════════════════════════════╗"
+        printf "║ TUX 4 UBUNTU - ${RED}UNINSTALL${NC}                        © 2016 Tux4Ubuntu Initiative ║\n"                       
+        printf "║ Let's Pause Tux a Bit                         http://tux4ubuntu.blogspot.com ║"
+        printf "╠══════════════════════════════════════════════════════════════════════════════╣"
         cat<<EOF    
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ TUX 4 UBUNTU - UNINSTALL                        © 2016 Tux4Ubuntu Initiative ║
-║ Let's Pause Tux a Bit                         http://tux4ubuntu.blogspot.com ║
-╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                              ║
 ║   Where do you want to remove Tux? (Type in one of the following numbers)    ║
 ║                                                                              ║
@@ -633,12 +635,9 @@ function uninstall_boot_logo {
                 header "Uninstalling Tux as BOOT LOGO" "$1"
                 # uninstall_not_found "plymouth-themes xclip"
                 folder_to_delete=$plymouth_dir/themes/tux-plymouth-theme
-
                 if [ -f $folder_to_delete ] ; then
                     sudo rm -r $folder_to_delete
                 fi
-
-                
                 printf "\033c"
                 header "Removing Tux as BOOT LOGO" "$1"
                 echo "Below you will see a list with all themes available, choose a new theme to view"
@@ -665,34 +664,31 @@ function uninstall_boot_logo {
 
 function uninstall_login_screen {
     printf "\033c"
-    header "Adding tuxedo class to your LOGIN SCREEN" "$1"
-    echo "This will disable the standard Ubuntu background and the grid with dots on your"
-    echo "login screen. By doing this the background will stay black all the way from the"
-    echo "boot loader to where the users background will load (which it does at the login" 
-    echo "screen). Ready to do this?"
+    header "Removing the tuxedo class to your LOGIN SCREEN" "$1"
+    echo "This will enable the standard Ubuntu background and the grid with dots on your"
+    echo "login screen. Ready to do this?"
     echo ""
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) 
                 echo "Starting configure dconf login settings..."
-                check_sudo
-                # To configure dconf we need to run as su, and then lightdm. 
-                # But first we put it in tmp for easier access
-                sudo cp tux-login-cleanup/tux-login-gsettings.sh /tmp
+                mkdir -p /tmp/reclutter
+
+                sudo cp tux-login-reclutter/tux-login-gsettings.sh /tmp/reclutter/
                 # Make it executable by all so that lightdm can run it
-                sudo chmod 0755 /tmp/tux-login-gsettings.sh
+                sudo chmod 0755 /tmp/reclutter/tux-login-gsettings.sh
                 # As already mentioned, we need to do it as su, otherwise changes don't take effect
-                sudo bash tux-login-cleanup/tux-login-script.sh 
+                sudo bash tux-login-reclutter/tux-login-script.sh 
                 # Now we can remove the script from tmp
-                sudo rm /tmp/tux-login-gsettings.sh
+                sudo rm -r /tmp/reclutter
                 printf "\033c"
-                header "Adding tuxedo class to your LOGIN SCREEN" "$1"
-                echo "Successfully tuxedoed up your Login Screen."
+                header "Removing the tuxedo class to your LOGIN SCREEN" "$1"
+                echo "Successfully recluttered your Login Screen. :)"
                 break;;
             No ) printf "\033c"
-                header "Adding tuxedo class to your LOGIN SCREEN" "$1"
-                echo "Tux stares at you with a curious look... Then he smiles and says 'Ok'."
+                header "Removing the tuxedo class to your LOGIN SCREEN" "$1"
+                echo "Awesome! Tux smiles and gives you a pat on the shoulder."
                 break;;
         esac
     done
