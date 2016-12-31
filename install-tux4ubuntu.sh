@@ -85,7 +85,9 @@ function change_boot_loader {
     echo "loader as well) is not without risk and that we can't be hold responsible if"  
     echo "you proceed? (Our website and internet can help but nothing is 100% safe)"
     echo ""
-    echo "WARNING! Before you continue, we also strongly recommend to backup all your data"
+    RED='\033[0;31m'
+    NC='\033[0m' # No Color
+    printf "${RED}WARNING! Before you continue, we also strongly recommend to backup all your data${NC}\n"                       
     echo ""
     check_sudo
     echo "(Type 1 or 2, then press ENTER)"
@@ -188,7 +190,7 @@ function change_boot_logo {
     echo "║                                                                              ║"
     echo "║ WORKAROUND: If possible install Ubuntu 16.04 Server edition and choose to    ║"
     echo "║             install Desktop environment when asked. Or run the following     ║"
-    echo "║             command after the installation:                                          ║"
+    echo "║             command after the installation:                                  ║"
     echo "║             > sudo apt-get install ubuntu-desktop                            ║"
     echo "╚══════════════════════════════════════════════════════════════════════════════╝"
     echo ""
@@ -322,29 +324,22 @@ function change_desktop {
                 echo "Installing packages..."
                 check_sudo
                 # Check if ppa's exists, otherwise add them
-                arc_ppa_added=false
-                if [ ! -f /etc/apt/sources.list.d/arc-theme.list ]; then
-                    echo "/etc/apt/sources.list.d/arc-theme.list not found, adding it now."
-                    sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
-                    arc_ppa_added=true
-                    echo "arc-theme's Release.key is being installed to get secure downloads and updates"
-                    arc_temp_dir=$(mktemp -d)
-                    wget -O $arc_temp_dir/Release.key http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
-                    sudo apt-key add - < $arc_temp_dir/Release.key
-                fi
-                if grep -q snwh/pulp /etc/apt/sources.list /etc/apt/sources.list.d/*; then
-                    echo "snwh/pulp already added to ppa."
-                else
-                    echo "Adds snwh/pulp to ppa."
-                    sudo add-apt-repository ppa:snwh/pulp
-                fi
+
+                echo "/etc/apt/sources.list.d/arc-theme.list not found, adding it now."
+                sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
+                arc_ppa_added=true
+                echo "arc-theme's Release.key is being installed to get secure downloads and updates"
+                arc_temp_dir=$(mktemp -d)
+                wget -O $arc_temp_dir/Release.key http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
+                sudo apt-key add - < $arc_temp_dir/Release.key
+                sudo add-apt-repository ppa:snwh/pulp
                 # Update apt-get
                 echo "Tux will now update your apt-get lists before install (which may take a while)."
                 echo ""
-                read -n1 -r -p "Press any key to continue..." key
+                sleep 1
                 sudo apt-get update
                 # Install packages
-                install_if_not_found "arc-theme paper-icon-theme paper-gtk-theme paper-cursor-theme unity-tweak-tool"
+                install_if_not_found "arc-theme paper-icon-theme paper-cursor-theme unity-tweak-tool"
                 # Download and install Roboto Fonts (as described here: https://wiki.ubuntu.com/Fonts)
                 if fc-list | grep -i roboto >/dev/null; then
                     echo "Roboto fonts already installed"
@@ -359,10 +354,11 @@ function change_desktop {
                     echo ""
                     echo "Tux will now update your font cache (may take a while)"
                     echo ""
-                    read -n1 -r -p "Press any key to continue..." key
+                    sleep 1
                     fc-cache -f -v
                 fi
                 # Copy an image of Tux to be your default launcher icon
+                sudo mv /usr/share/unity/icons/launcher_bfb.png /usr/share/unity/icons/launcher_bfb.bak
                 sudo cp tux-icon-theme/launcher_bfb.png /usr/share/unity/icons/
                 printf "\033c"
                 header "Adding tuxedo class to your DESKTOP" "$1"
@@ -374,7 +370,7 @@ function change_desktop {
                 echo "2. Under Icons       ->      Choose 'Paper'"
                 echo "3. Under Cursors     ->      Choose 'Paper'"
                 echo "4. Under Fonts       ->      Default Font -> 'Roboto Regular'"
-                echo "                          Window Title Font -> 'Roboto Black'"
+                echo "                                Window Title Font -> 'Roboto Black'"
                 echo ""
                 echo "IMPORTANT: Close Unity Tweak Tool to continue installation."
                 read -n1 -r -p "Press any key to open Unity Tweak Tool..." key
@@ -542,13 +538,14 @@ function uninstall {
     while :
     do
         clear
+        printf "\033c"
         # Menu system as found here: http://stackoverflow.com/questions/20224862/bash-script-always-show-menu-after-loop-execution
         RED='\033[0;31m'
         NC='\033[0m' # No Color
-        printf "╔══════════════════════════════════════════════════════════════════════════════╗"
+        printf "╔══════════════════════════════════════════════════════════════════════════════╗\n"
         printf "║ ${RED}TUX 4 UBUNTU - UNINSTALL${NC}                        © 2016 Tux4Ubuntu Initiative ║\n"                       
-        printf "║ Let's Pause Tux a Bit                         http://tux4ubuntu.blogspot.com ║"
-        printf "╠══════════════════════════════════════════════════════════════════════════════╣"
+        printf "║ Let's Pause Tux a Bit                         http://tux4ubuntu.blogspot.com ║\n"
+        printf "╠══════════════════════════════════════════════════════════════════════════════╣\n"
         cat<<EOF    
 ║                                                                              ║
 ║   Where do you want to remove Tux? (Type in one of the following numbers)    ║
@@ -561,6 +558,7 @@ function uninstall {
 ║   5) *Desktop Theme/Icons/Cursors/Fonts + Tux  - Remove Tux desktop theming  ║
 ║   6) Wallpapers                                - Remove Tux favourite images ║
 ║   7) Games                                     - Uninstall games feat. Tux   ║
+║                                                                              ║
 ║   * = Check back in 3 days and we have added it                              ║
 ║   ------------------------------------------------------------------------   ║
 ║   9) Back to installing Tux                    - Goes back to installer      ║
@@ -580,7 +578,7 @@ EOF
                 ((i++))
                 uninstall_login_screen $i
                 ((i++))
-                #uninstall_desktop $i
+                uninstall_desktop $i
                 ((i++))
                 uninstall_wallpaper $i
                 ((i++))
@@ -591,12 +589,7 @@ EOF
         "2")    uninstall_boot_loader ;;
         "3")    uninstall_boot_logo ;;
         "4")    uninstall_login_screen ;;
-        "5")    printf "\033c"
-                echo "Come back in a couple of days and this works too... Sorry for the inconvenience."
-                # Coming soon
-                echo ""
-                read -n1 -r -p "Press any key to continue..." key ;;
-                #uninstall_desktop ;;
+        "5")    uninstall_desktop ;;
         "6")    uninstall_wallpaper ;;
         "7")    uninstall_games ;;
         "8")    return_the_tshirt ;;
@@ -693,92 +686,68 @@ function uninstall_login_screen {
 
 function uninstall_desktop {
     printf "\033c"
-    header "Adding tuxedo class to your DESKTOP" "$1"
-    echo "Tux has scanned the web for the best themes and he likes:"
-    echo "   - Arc Theme by horst3180 <https://github.com/horst3180/arc-theme>"
-    echo "   - Paper Icon & Cursor Theme at snwh.org <https://snwh.org/paper>"
-    echo "   - Roboto Font by Google <https://www.fontsquirrel.com/fonts/roboto>"
-    echo ""
-    echo "He plans to install these and 'Unity Tweak Tool' (if non of these are installed"
-    echo "already). THEN, he plans to set himself as your 'Search your computer'-icon in"
-    echo "the launcher (the icon furthest up or left depending on where your launcher is)."
-    echo "Are you okay with that?"
+    header "Removing tuxedo class to your DESKTOP" "$1"
+    echo "This will bring back the original Ubuntu launcher symbol, and ask seperately if"
+    echo "you want to uninstall the packages that came with it. Ready to proceed?"
     echo ""
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) 
                 printf "\033c"
-                header "Adding tuxedo class to your DESKTOP" "$1"
-                echo "Installing packages..."
+                header "Removing tuxedo class to your DESKTOP" "$1"
+                echo "Uninstalling packages..."
+                if [ -f /usr/share/unity/icons/launcher_bfb.bak ]; then
+                    sudo mv /usr/share/unity/icons/launcher_bfb.bak /usr/share/unity/icons/launcher_bfb.png
+                else
+                    sudo cp tux-icon-theme/launcher_bfb.bak /usr/share/unity/icons/launcher_bfb.png
+                fi
                 check_sudo
-                # Check if ppa's exists, otherwise add them
-                arc_ppa_added=false
-                if [ ! -f /etc/apt/sources.list.d/arc-theme.list ]; then
-                    echo "/etc/apt/sources.list.d/arc-theme.list not found, adding it now."
-                    sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
-                    arc_ppa_added=true
-                    echo "arc-theme's Release.key is being installed to get secure downloads and updates"
-                    arc_temp_dir=$(mktemp -d)
-                    wget -O $arc_temp_dir/Release.key http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
-                    sudo apt-key add - < $arc_temp_dir/Release.key
-                fi
-                if grep -q snwh/pulp /etc/apt/sources.list /etc/apt/sources.list.d/*; then
-                    echo "snwh/pulp already added to ppa."
+
+                if dpkg --get-selections | grep -q "^arc-theme[[:space:]]*install$" >/dev/null; then
+                    echo "The following packages will be REMOVED:"
+                    echo "  arc-theme"
+                    read -p "Do you want to continue? [Y/n] " prompt
+                    if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]
+                    then
+                        sudo apt-get remove -y arc-theme
+                        if grep -q arc-theme /etc/apt/sources.list /etc/apt/sources.list.d/*; then
+                            echo "/etc/apt/sources.list.d/arc-theme.list found, removing it now."
+                            sudo rm /etc/apt/sources.list.d/arc-theme.list
+
+                        fi
+                    else
+                        echo ""
+                    fi
+
                 else
-                    echo "Adds snwh/pulp to ppa."
-                    sudo add-apt-repository ppa:snwh/pulp
+                    echo "Arc Theme not installed."
                 fi
-                # Update apt-get
-                echo "Tux will now update your apt-get lists before install (which may take a while)."
-                echo ""
-                read -n1 -r -p "Press any key to continue..." key
-                sudo apt-get update
-                # Install packages
-                install_if_not_found "arc-theme paper-icon-theme paper-gtk-theme paper-cursor-theme unity-tweak-tool"
-                # Download and install Roboto Fonts (as described here: https://wiki.ubuntu.com/Fonts)
-                if fc-list | grep -i roboto >/dev/null; then
-                    echo "Roboto fonts already installed"
+
+
+
+                if dpkg --get-selections | grep -q "^paper-icon-theme[[:space:]]*install$" >/dev/null; then
+                    echo "The following packages will be REMOVED:"
+                    echo "  paper-icon theme paper-cursor-theme"
+                    read -p "Do you want to continue? [Y/n] " prompt
+                    if [[ $prompt == "y" || $prompt == "Y" || $prompt == "yes" || $prompt == "Yes" ]]
+                    then
+                        sudo apt-get remove -y paper-icon-theme paper-gtk-theme paper-cursor-theme 
+                        sudo add-apt-repository --remove ppa:snwh/pulp
+                    fi
+                    
                 else
-                    echo "Installing Roboto fonts by Google."
-                    roboto_temp_dir=$(mktemp -d)
-                    wget -O $roboto_temp_dir/roboto.zip https://www.fontsquirrel.com/fonts/download/roboto
-                    unzip $roboto_temp_dir/roboto.zip -d $roboto_temp_dir
-                    sudo mkdir -p ~/.fonts
-                    sudo cp $roboto_temp_dir/*.ttf ~/.fonts/
-                    echo "Successfully installed Roboto Font by Google."
-                    echo ""
-                    echo "Tux will now update your font cache (may take a while)"
-                    echo ""
-                    read -n1 -r -p "Press any key to continue..." key
-                    fc-cache -f -v
+                    echo "paper-icon-theme not installed."
                 fi
-                # Copy an image of Tux to be your default launcher icon
-                sudo cp tux-icon-theme/launcher_bfb.png /usr/share/unity/icons/
-                printf "\033c"
-                header "Adding tuxedo class to your DESKTOP" "$1"
-                echo "Installed theme, icons, cursors and fonts (and Tux on your launcher)." 
-                echo "We'll open Unity Tweak Tool for you and there you can choose"
-                echo "(as suggested by Tux):"
+
+                uninstall_if_found "unity-tweak-tool"
+                sudo apt -y autoremove
                 echo ""
-                echo "Under Themes      ->      Choose 'Arc'"
-                echo "Under Icons       ->      Choose 'Paper'"
-                echo "Under Cursors     ->      Choose 'Paper'"
-                echo "Under Fonts       ->      Default Font -> 'Roboto Regular'"
-                echo "                          Window Title Font -> 'Roboto Black'"
-                echo ""
-                echo "IMPORTANT: Close Unity Tweak Tool to continue installation."
-                read -n1 -r -p "Press any key to open Unity Tweak Tool..." key
-                unity-tweak-tool -a
-                printf "\033c"
-                header "Adding tuxedo class to your DESKTOP" "$1"
-                echo "Successfully added some theming options á la Tux. It's highly recommended to reboot soon to make everything look properly (especially regarding the Arc-theme)."
-                echo ""
-                echo "(However, it's still safe to continue installation)"
+                echo "Successfully uninstalled the packages you chose"
                 break;;
             No ) printf "\033c"
-                header "Adding tuxedo class to your DESKTOP" "$1"
-                echo "Tux stares at you with a curious look... Then he smiles and says 'Ok'."
+            header "Removing tuxedo class to your DESKTOP" "$1"
+                echo "Awesome! Tux smiles and gives you a pat on the shoulder."
                 break;;
         esac
     done
@@ -788,7 +757,7 @@ function uninstall_desktop {
 
 function uninstall_wallpaper {
     printf "\033c"
-    header "Adding Tux's WALLPAPER COLLECTION" "$1"
+    header "Removing Tux's WALLPAPER COLLECTION" "$1"
     gh_repo="tux4ubuntu-wallpapers"
     echo "This will remove all Tux 4K wallpapers."
     echo "Ready to do this?"
@@ -806,11 +775,11 @@ function uninstall_wallpaper {
                 sudo rm -rf ~/$pictures_folder/Tux4Ubuntu\ Wallpapers
 
                 printf "\033c"
-                header "Adding Tux's WALLPAPER COLLECTION" "$1"
+                header "Removing Tux's WALLPAPER COLLECTION" "$1"
                 echo "Successfully removed the Tux's wallpapers."
                 break;;
             No ) printf "\033c"
-                header "Adding Tux's WALLPAPER COLLECTION" "$1"
+                header "Removing Tux's WALLPAPER COLLECTION" "$1"
                 echo "Tux stares at you with a curious look... Then he smiles and says 'Ok'."
                 break;;
         esac
@@ -821,8 +790,8 @@ function uninstall_wallpaper {
 
 function uninstall_games {
     printf "\033c"
-    header "Adding Tux GAMES" "$1"
-    echo "This will uninstall all the following classic Tux games:"
+    header "Removing Tux GAMES" "$1"
+    echo "This will ask to uninstall the following classic Tux games:"
     echo "  - SuperTux                          (A lot like Super Mario)"
     echo "  - SuperTuxKart                      (A lot like Mario Kart)"
     echo "  - ExtremeTuxRacer                   (Help Tux slide down slopes)"
@@ -830,21 +799,21 @@ function uninstall_games {
     echo "  - WarMUX                            (A lot like Worms)"
     echo ""
     check_sudo
-    echo "Ready to delete them all!? (if you want to uninstall only a specific game,"
-    echo "type: sudo apt-get remove 'the-game-name' and press ENTER in a terminal)"
+    echo "Ready to start deleting them?"
     echo ""
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) 
                 printf "\033c"
-                header "Adding Tux GAMES" "$1"
+                header "Removing Tux GAMES" "$1"
                 echo "Initiating Tux Games uninstall..."
                 uninstall_if_found "supertux supertuxkart extremetuxracer freedroidrpg warmux"
+                sudo apt -y autoremove
                 echo "Successfully uninstalled the Tux Games."
                 break;;
             No ) printf "\033c"
-                header "Adding Tux GAMES" "$1"
+                header "Removing Tux GAMES" "$1"
                 echo "The sound of Tux flapping with his feets slowly turns silent when he realizes" 
                 echo "your response... He shrugs and answer with a lowly voice 'ok'."
                 break;;
@@ -898,7 +867,7 @@ function install_if_not_found {
             echo -e "$pkg is already installed"
         else
             echo "Installing $pkg."
-            if sudo apt-get -qq install $pkg; then
+            if sudo apt-get -qq --allow-unauthenticated install $pkg; then
                 echo "Successfully installed $pkg"
             else
                 echo "Error installing $pkg"
@@ -911,8 +880,8 @@ function uninstall_if_found {
     # As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
     for pkg in $1; do
         if dpkg --get-selections | grep -q "^$pkg[[:space:]]*install$" >/dev/null; then
-            echo "Installing $pkg."
-            if sudo apt-get -y remove $pkg; then
+            echo "Uninstalling $pkg."
+            if sudo apt-get remove $pkg; then
                 echo "Successfully uninstalled $pkg"
             else
                 echo "Error uninstalling $pkg"
@@ -963,7 +932,7 @@ do
     # Menu system as found here: http://stackoverflow.com/questions/20224862/bash-script-always-show-menu-after-loop-execution
     cat<<EOF    
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ TUX 4 UBUNTU ver 1.0                            © 2016 Tux4Ubuntu Initiative ║
+║ TUX 4 UBUNTU ver 1.1                            © 2016 Tux4Ubuntu Initiative ║
 ║ Let's Bring Tux to Ubuntu                     http://tux4ubuntu.blogspot.com ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                              ║
