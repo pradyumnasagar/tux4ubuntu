@@ -1,3 +1,24 @@
+# GRUB2 theme
+                       echo "If you're running an older system (or maybe you're running a virtual machine)"
+                    echo "Tux can customize the BIOS capable GRUB2 loader a little as well. Want to try?";
+                    echo ""
+                    select yn in "Yes" "No"; do
+                        case $yn in
+                            Yes ) printf "\033c"
+                                header "Adding Tux to BOOT LOADER" "$1"
+                                change_grub2_theme
+                                echo ""
+                                echo "Successfully themed your GRUB2 Boot Loader."
+                                break;;
+                            No ) printf "\033c"
+                                header "Adding Tux to BOOT LOADER" "$1"
+                                echo "Tux stares at you with a curious look... Then he smiles and says 'Ok'."
+                                break;;
+                        esac
+                    done
+
+# Bootloader Uninstaller   
+   
     header "Adding Tux to BOOT LOADER" "$1"
     echo "Are you sure you really want to remove Tux from your boot logo?"
     echo ""

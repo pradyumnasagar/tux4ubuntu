@@ -164,23 +164,8 @@ function change_boot_loader {
                     echo "Switching from Legacy to UEFI/EFI might do the trick and will enable a lot"
                     echo "more customization to your boot loader."
                     echo ""
-                    echo "If you're running an older system (or maybe you're running a virtual machine)"
-                    echo "Tux can customize the BIOS capable GRUB2 loader a little as well. Want to try?";
-                    echo ""
-                    select yn in "Yes" "No"; do
-                        case $yn in
-                            Yes ) printf "\033c"
-                                header "Adding Tux to BOOT LOADER" "$1"
-                                change_grub2_theme
-                                echo ""
-                                echo "Successfully themed your GRUB2 Boot Loader."
-                                break;;
-                            No ) printf "\033c"
-                                header "Adding Tux to BOOT LOADER" "$1"
-                                echo "Tux stares at you with a curious look... Then he smiles and says 'Ok'."
-                                break;;
-                        esac
-                    done
+
+
                 fi
                 break;;
             No ) printf "\033c"
@@ -820,7 +805,7 @@ function uninstall_wallpaper {
                 pictures_folder=${pictures_folder_uncut#$prefix}
                 sudo rm -rf ~/$pictures_folder/Tux4Ubuntu\ Wallpapers
 
-                #printf "\033c"
+                printf "\033c"
                 header "Adding Tux's WALLPAPER COLLECTION" "$1"
                 echo "Successfully removed the Tux's wallpapers."
                 break;;
