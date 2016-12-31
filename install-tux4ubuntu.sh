@@ -555,7 +555,7 @@ function uninstall {
 ║   2) *Boot Loader                              - Themes OS selection at boot ║
 ║   3) Boot Logo                                 - Remove Plymouth theme       ║
 ║   4) Login Screen                              - Add grid and wallpaper      ║
-║   5) *Desktop Theme/Icons/Cursors/Fonts + Tux  - Remove Tux desktop theming  ║
+║   5) Desktop Theme/Icons/Cursors/Fonts + Tux   - Remove Tux desktop theming  ║
 ║   6) Wallpapers                                - Remove Tux favourite images ║
 ║   7) Games                                     - Uninstall games feat. Tux   ║
 ║                                                                              ║
