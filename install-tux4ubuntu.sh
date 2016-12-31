@@ -694,8 +694,6 @@ function uninstall_desktop {
     select yn in "Yes" "No"; do
         case $yn in
             Yes ) 
-                printf "\033c"
-                header "Removing tuxedo class to your DESKTOP" "$1"
                 echo "Uninstalling packages..."
                 if [ -f /usr/share/unity/icons/launcher_bfb.bak ]; then
                     sudo mv /usr/share/unity/icons/launcher_bfb.bak /usr/share/unity/icons/launcher_bfb.png
@@ -742,6 +740,17 @@ function uninstall_desktop {
 
                 uninstall_if_found "unity-tweak-tool"
                 sudo apt -y autoremove
+
+                mkdir -p /tmp/theme
+                sudo cp tux-desktop-themes/tux-theme-gsettings.sh /tmp/theme/
+                # Make it executable by all so that lightdm can run it
+                sudo chmod 0755 /tmp/theme/tux-theme-gsettings.sh
+                # As already mentioned, we need to do it as su, otherwise changes don't take effect
+                sudo bash tux-desktop-themes/tux-theme-script.sh 
+                # Now we can remove the script from tmp
+                sudo rm -r /tmp/theme
+
+
                 echo ""
                 echo "Successfully uninstalled the packages you chose"
                 break;;
@@ -751,6 +760,7 @@ function uninstall_desktop {
                 break;;
         esac
     done
+    echo "Set your themes in System settings > Appearance and then reboot for chances to take effect."
     echo ""
     read -n1 -r -p "Press any key to continue..." key
 }
