@@ -81,82 +81,37 @@ fi
 function change_boot_loader { 
     printf "\033c"
     header "Adding Tux to BOOT LOADER" "$1"
-    echo "Do you understand that changing boot loader theme (and potentially the boot"
-    echo "loader as well) is not without risk and that we can't be hold responsible if"  
-    echo "you proceed? (Our website and internet can help but nothing is 100% safe)"
+    echo "DO NOT INSTALL IF YOU ARE ONLY RUNNING ONE OPERATIVE SYSTEM"
+    echo "(since this is a tool for dual booting)"
     echo ""
     RED='\033[0;31m'
     NC='\033[0m' # No Color
-    printf "${RED}WARNING! Before you continue, we also strongly recommend to backup all your data${NC}\n"                       
+    printf "${RED}WARNING! Before you continue backup all your data${NC}\n"                       
+    echo ""
+    echo "Do you understand that changing bootloader theme (and potentially the boot"
+    echo "loader as well if you don't have rEFInd installed) is not without risk and"
+    echo "that we can't be hold responsible if you proceed? (Our website and internet"
+    echo "can help but nothing is 100% safe)"
     echo ""
     check_sudo
     echo "(Type 1 or 2, then press ENTER)"
     select yn in "Yes" "No"; do
         case $yn in
-            Yes ) printf "\033c"
+            Yes )
                 if [ -d /sys/firmware/efi ]
                 then 
-                    if ! grep -q rodsmith/refind /etc/apt/sources.list /etc/apt/sources.list.d/*; then
-                        # The rEFInd ppa is not registered. Ask if user wants it installed.
-                        printf "\033c"
-                        header "Adding Tux to BOOT LOADER" "$1"
-                        echo "EFI bootloader detected";
-                        echo ""
-                        echo "Your system is new enough to boot using EFI, but you're not running the more graphical"
-                        echo "bootloader rEFInd. Would you like to install it? Select No if:"
-                        echo "    - You want to keep the standard (a bit more stable) GRUB2 boot loader"
-                        echo "    - You want to theme GRUB2 instead (not as cool but it gets nicer)"
-                        echo "    - You are not dual-booting (since the boot loader only let you choose between OSes)"
-                        echo ""
-                        echo "(Type 1 or 2, then press ENTER)"
-                        select yn in "Yes" "No"; do
-                            case $yn in
-                                Yes ) printf "\033c"
-                                    header "Adding Tux to BOOT LOADER" "$1"
-                                    # Commands to add the ppa
-                                    sudo apt-add-repository ppa:rodsmith/refind
-                                    sudo apt-get update
-                                    # Check if refind is installed
-                                    install_if_not_found "refind"
-                                    echo "Done";
-                                    break;;
-                                No ) printf "\033c"
-                                    header "Adding Tux to BOOT LOADER" "$1"
-                                    # Let the user choose if they want to install GRUB2 theme instead
-                                    echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
-                                    echo ""
-                                    echo "However, Tux can also customize your GRUB2 theme. Want to try?"
-                                    select yn in "Yes" "No"; do
-                                        case $yn in
-                                            Yes ) printf "\033c"
-                                                header "Adding Tux to BOOT LOADER" "$1"
-                                                change_grub2_theme
-                                                break;;
-                                            No ) printf "\033c"
-                                                header "Adding Tux to BOOT LOADER" "$1"
-                                                echo "'Come back when you're ready, I'll be waiting here' says Tux."
-                                                break;;
-                                        esac
-                                    done
-                            esac
-                        done
-                    else
-                        printf "\033c"
-                        header "Adding Tux to BOOT LOADER" "$1"
-                        echo "Seems like you have rEFInd installed."
-                    fi
-                    printf "\033c"
-                    header "Adding Tux to BOOT LOADER" "$1"
+                    # The rEFInd ppa is not registered. Ask if user wants it installed.
+                    echo "Installing rEFInd bootloader"
+                    sudo apt-add-repository ppa:rodsmith/refind
+                    sudo apt-get update
+                    # Check if refind is installed
+                    install_if_not_found "refind"
                     echo "Initiating to copy folder tux-refind-theme."
-                    echo ""
                     check_sudo
                     sudo mkdir -p /boot/efi/EFI/refind/themes
                     sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
                     # Here we add a last line if it not already exists (If other themes exists doesn't matter since our line ends up last and will therefore be used)
                     sudo grep -q -F 'include themes/tux-refind-theme/theme.conf' /boot/efi/EFI/refind/refind.conf || echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf
-                    echo ""
-                    printf "\033c"
-                    header "Adding Tux to BOOT LOADER" "$1"
                     echo "Successfully copied 'tux-refind-theme' to your rEFInd themes folder."
                 else 
                     header "Adding Tux to BOOT LOADER" "$1"
@@ -164,14 +119,13 @@ function change_boot_loader {
                     echo ""
                     echo "If you're running a newer system that support EFI, check your BIOS settings."
                     echo "Switching from Legacy to UEFI/EFI might do the trick and will enable a lot"
-                    echo "more customization to your boot loader."
-                    echo ""
+                    echo "more customization to your boot loader. But if that's not possible, you can"
+                    echo "still add Tux to everywhere else."
 
 
                 fi
                 break;;
             No ) printf "\033c"
-                header "Adding Tux to BOOT LOADER" "$1"
                 echo "It's not that dangerous though! Feel free to try when you're ready. Tux will be waiting..."
 
                 break;;
@@ -491,28 +445,31 @@ function install_games {
 function get_the_tshirt {
     printf "\033c"
     header "Get the T-SHIRT" "$1"
-    echo "Installed everything? Then it's time to spread the word!"
-    echo "And if you're interested, we have some cool t-shirts with Tux on them."
+    # Original T-shirt art by Joan Stark found here: http://www.ascii-code.com/ascii-art/clothing-and-accessories/shirts.php
+    # Tux painted by ppa package 'cowsay'
+cat << "EOF"
+                             .-""`'-..____..-'`""-.            
+                           /`\                    /`\          
+                          /`  |                  |  `\         
+                         /`   |       .--.       |   `\        
+                        /     |      |o_o |      |     \       
+                        '-.__.|      |:_/ |      |.___.-'            
+                              |     //   \ \     |            
+                              |    (|     | )    |    
+                              |   /'\_   _/`\    |             
+                              |   \___)=(___/    |             
+                              |                  |                     
+                              |                  |             
+                              '._              _.'             
+                                 `""--------""`                
+                                                                         
+              17% PROMOTION CODE (January 6th - January 12th): HAPPY17
+EOF
     echo ""
-    echo "Want to check them out?"
-    echo ""
-    echo "(Type 1 or 2, then press ENTER)"
-    select yn in "Yes" "No"; do
-        case $yn in
-            Yes ) 
-                printf "\033c"
-                header "Get the T-SHIRT" "$1"
-                echo "Launching website in your favourite browser."
-                x-www-browser https://shop.spreadshirt.com/tux4ubuntu/;
-                break;;
-            No ) printf "\033c"
-                header "Get the T-SHIRT" "$1"
-                echo "Check out tux4ubuntu.blogspot.com if you change your mind."
-                break;;
-        esac
-    done
-    echo ""
+    echo "Launching website in your favourite browser."
+    x-www-browser https://tux4ubuntu.blogspot.com/p/web-shop.html &
     read -n1 -r -p "Press any key to continue..." key
+    echo ""
 }
 
 function temp_uninstall {
@@ -552,14 +509,13 @@ function uninstall {
 ║                                                                              ║
 ║   1) Everywhere                                - Uninstall all of the below  ║
 ║   ------------------------------------------------------------------------   ║
-║   2) *Boot Loader                              - Themes OS selection at boot ║
+║   2) Boot Loader                               - Themes OS selection at boot ║
 ║   3) Boot Logo                                 - Remove Plymouth theme       ║
 ║   4) Login Screen                              - Add grid and wallpaper      ║
 ║   5) Desktop Theme/Icons/Cursors/Fonts + Tux   - Remove Tux desktop theming  ║
 ║   6) Wallpapers                                - Remove Tux favourite images ║
 ║   7) Games                                     - Uninstall games feat. Tux   ║
-║                                                                              ║
-║   * = Check back in 3 days and we have added it                              ║
+║   8) Return the t-shirt                        - Return your t-shirt         ║
 ║   ------------------------------------------------------------------------   ║
 ║   9) Back to installing Tux                    - Goes back to installer      ║
 ║   ------------------------------------------------------------------------   ║
@@ -572,7 +528,7 @@ EOF
         "1")    # Uninstall everything
                 STEPCOUNTER=true
                 i=1
-                #uninstall_boot_loader $i
+                uninstall_boot_loader $i
                 ((i++))
                 uninstall_boot_logo $i
                 ((i++))
@@ -583,8 +539,8 @@ EOF
                 uninstall_wallpaper $i
                 ((i++))
                 uninstall_games $i
-                #((i++))
-                #return_the_tshirt $i
+                ((i++))
+                return_the_tshirt $i
                 ;;
         "2")    uninstall_boot_loader ;;
         "3")    uninstall_boot_logo ;;
@@ -604,8 +560,57 @@ EOF
 
 function uninstall_boot_loader { 
     printf "\033c"
-    echo "Come back in a couple of days and this works too... Sorry for the inconvenience."
-    # Coming soon
+    header "Removing Tux in BOOT LOADER" "$1"
+    echo "Are you sure you want to remove Tux from your bootloader?"
+    echo ""
+    echo "WARNING! Before you continue, we also strongly recommend to backup all your data"
+    echo ""
+    echo "(Type 1 or 2, then press ENTER)"
+    select yn in "Yes" "No"; do
+        case $yn in
+            Yes ) echo "Do you wish to remove the rEFInd bootloader as well?"
+                select yn in "Yes" "No"; do
+                    case $yn in
+                        Yes ) printf "\033c"
+                            header "Removing Tux in BOOT LOADER" "$1"
+                            echo "Uninstalling rEFInd."
+                            sudo apt-get remove -y "refind"
+                            sudo add-apt-repository --remove ppa:rodsmith/refind
+                            sudo rm -r /boot/efi/EFI/refind
+                            echo "Successfully removed rEFInd bootloader and the Tux4Ubuntu theme." 
+                            break;;
+                        No ) printf "\033c"
+                            header "Removing Tux to BOOT LOADER" "$1"
+                            # Let the user choose if they want to install GRUB2 theme instead
+                            echo "Ok, rEFInd will be spared but Tux removed."
+                            last_line="$(sudo awk '/./{line=$0} END{print line}' /boot/efi/EFI/refind/refind.conf)"                            
+                            theme_line="include themes/tux-refind-theme/theme.conf"
+                            if [ "$last_line" == "$theme_line" ] 
+                            then
+                                echo "Removing theme from rEFInd."
+                                sudo sed -i '$ d' /boot/efi/EFI/refind/refind.conf
+                                sudo rm -f -r /efi/EFI/boot/refind/themes/tux-refind-theme   
+                                echo "Successfully removed the theme from rEFInd."                                 
+                            else
+                                printf "\033c"
+                                header "Removing Tux to BOOT LOADER" "$1"
+                                echo "Seems like someone edited the refind.conf file, uninstallation must be done"
+                                echo "manually (or you may removed the theme already). Go to:"
+                                echo "tux4ubuntu.blogspot.com/2016/11/tux-boot-loader-theme-for-ubuntu-refind.html"
+                                echo "and read the instructions on how to uninstall Tux4Ubuntu rEFInd theme."
+                            fi
+                        break;;
+                    esac
+                done
+                break;;
+            No ) printf "\033c"
+                header "Removing Tux to BOOT LOADER" "$1"
+                echo "Awesome! Tux smiles and gives you a pat on the shoulder."
+            break;;
+        esac
+    done
+
+    
     echo ""
     read -n1 -r -p "Press any key to continue..." key
 }
@@ -835,29 +840,30 @@ function uninstall_games {
 
 function return_the_tshirt {
     printf "\033c"
-    header "Get the T-SHIRT" "$1"
-    echo "Installed everything? Then it's time to spread the word!"
-    echo "And if you're interested, we have some cool t-shirts with Tux on them."
+    header "Return the T-SHIRT" "$1"
+    # Original T-shirt art by Joan Stark found here: http://www.ascii-code.com/ascii-art/clothing-and-accessories/shirts.php
+    # Tux painted by ppa package 'cowsay'
+cat << "EOF"
+                             .-""`'-..____..-'`""-.            
+                           /`\                    /`\          
+                          /`  |                  |  `\         
+                         /`   |       .--.       |   `\        
+                        /     |      |o_o |      |     \       
+                        '-.__.|      |:_/ |      |.___.-'            
+                              |     //   \ \     |            
+                              |    (|     | )    |    
+                              |   /'\_   _/`\    |             
+                              |   \___)=(___/    |             
+                              |                  |                     
+                              |                  |             
+                              '._              _.'             
+                                 `""--------""`                
+EOF
     echo ""
-    echo "Want to check them out?"
-    echo ""
-    echo "(Type 1 or 2, then press ENTER)"
-    select yn in "Yes" "No"; do
-        case $yn in
-            Yes ) 
-                printf "\033c"
-                header "Get the T-SHIRT" "$1"
-                echo "Launching website in your favourite browser."
-                x-www-browser http://tux4ubuntu.blogspot.se/2016/11/done.html;
-                break;;
-            No ) printf "\033c"
-                header "Get the T-SHIRT" "$1"
-                echo "Check out tux4ubuntu.blogspot.com if you change your mind."
-                break;;
-        esac
-    done
-    echo ""
+    echo "Launching website in your favourite browser."
+    x-www-browser https://tux4ubuntu.blogspot.com/p/web-shop.html &
     read -n1 -r -p "Press any key to continue..." key
+    echo ""
 }
 
 function check_sudo {
@@ -942,7 +948,7 @@ do
     # Menu system as found here: http://stackoverflow.com/questions/20224862/bash-script-always-show-menu-after-loop-execution
     cat<<EOF    
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ TUX 4 UBUNTU ver 1.1                            © 2016 Tux4Ubuntu Initiative ║
+║ TUX 4 UBUNTU ver 1.2                            © 2016 Tux4Ubuntu Initiative ║
 ║ Let's Bring Tux to Ubuntu                     http://tux4ubuntu.blogspot.com ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                              ║
