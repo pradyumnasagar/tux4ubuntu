@@ -108,8 +108,9 @@ function change_boot_loader {
                     install_if_not_found "refind"
                     echo "Initiating to copy folder tux-refind-theme."
                     check_sudo
+                    sudo rm -rf /boot/efi/EFI/refind/themes/tux-refind-theme
                     sudo mkdir -p /boot/efi/EFI/refind/themes
-                    sudo cp -r tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
+                    sudo cp -rf tux-refind-theme /boot/efi/EFI/refind/themes/tux-refind-theme
                     # Here we add a last line if it not already exists (If other themes exists doesn't matter since our line ends up last and will therefore be used)
                     sudo grep -q -F 'include themes/tux-refind-theme/theme.conf' /boot/efi/EFI/refind/refind.conf || echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf
                     echo "Successfully copied 'tux-refind-theme' to your rEFInd themes folder."
