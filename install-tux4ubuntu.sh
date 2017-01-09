@@ -117,7 +117,8 @@ function change_boot_loader {
                     # Here we add a last line if it not already exists (If other themes exists doesn't matter since our line ends up last and will therefore be used)
                     sudo grep -q -F 'include themes/tux-refind-theme/theme.conf' /boot/efi/EFI/refind/refind.conf || echo 'include themes/tux-refind-theme/theme.conf' | sudo tee -a /boot/efi/EFI/refind/refind.conf
                     echo "Successfully copied 'tux-refind-theme' to your rEFInd themes folder."
-                else 
+                else
+                    printf "\033c"
                     header "Adding Tux to BOOT LOADER" "$1"
                     echo "BIOS boot noticed."
                     echo ""
@@ -958,7 +959,7 @@ do
     # Menu system as found here: http://stackoverflow.com/questions/20224862/bash-script-always-show-menu-after-loop-execution
     cat<<EOF    
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ TUX 4 UBUNTU ver 1.2                            © 2016 Tux4Ubuntu Initiative ║
+║ TUX 4 UBUNTU ver 1.3                            © 2016 Tux4Ubuntu Initiative ║
 ║ Let's Bring Tux to Ubuntu                     http://tux4ubuntu.blogspot.com ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                              ║
