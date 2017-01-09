@@ -38,14 +38,17 @@ set -e
 printf "\033c"
 # Set global values
 STEPCOUNTER=false # Sets to true if user choose to install Tux Everywhere
-
+OS_VERSION="";
 # Here we check if OS is supported
 # More info on other OSes regarding plymouth: http://brej.org/blog/?p=158
 if [[ `lsb_release -rs` == "16.04" ]]
 then
     # The plymouth dir was moved in one update, therefore we have prepared for this one here
 	plymouth_dir="/usr/share/plymouth"
-elif [[ `lsb_release -rs` == "17.04" ]]
+    OS_VERSION="16.04"
+elif [[ `lsb_release -rs` == "16.10" ]]
+    plymouth_dir="/usr/share/plymouth"
+    OS_VERSION="16.10"
 then
 	plymouth_dir="/usr/share/plymouth"
 else
@@ -162,37 +165,42 @@ function change_boot_logo {
                 printf "\033c"
                 header "Adding Tux as BOOT LOGO" "$1"
                 check_sudo
-                # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
-                # so instead of simply sudo cp -r tux-plymouth-theme/ $plymouth_dir/themes/tux-plymouth-theme we 
-                # have to (6 steps):
-                    
-                # 1) Add other themes through the apt-get package 'plymouth-themes' that seem to work as well as 'xclip'
-                # -package to successfully copy the internals of tux.script, tux.plymouth to a copy of the plymouth-themes's
-                # 'script'-theme. To do this, we first check if xclip and plymouth-themes is installed, and if not, we ask the user if they
-                # are okey with installing them. As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
-                install_if_not_found "plymouth-themes xclip"
+                
+                if [[ OS_VERSION == "16.04" ]]; then
+                    # Workaround what we think is an Ubuntu Plymouth bug that doesn't seem to allow foreign plymouth themes
+                    # so instead of simply sudo cp -r tux-plymouth-theme/ $plymouth_dir/themes/tux-plymouth-theme we 
+                    # have to (6 steps):
+                        
+                    # 1) Add other themes through the apt-get package 'plymouth-themes' that seem to work as well as 'xclip'
+                    # -package to successfully copy the internals of tux.script, tux.plymouth to a copy of the plymouth-themes's
+                    # 'script'-theme. To do this, we first check if xclip and plymouth-themes is installed, and if not, we ask the user if they
+                    # are okey with installing them. As found here: http://askubuntu.com/questions/319307/reliably-check-if-a-package-is-installed-or-not
+                    install_if_not_found "plymouth-themes xclip"
 
-                # 2) Copy one of these themes, the theme called script.
-                sudo cp -r $plymouth_dir/themes/script $plymouth_dir/themes/tux-plymouth-theme;  
-                
-                # 3) Add tux-plymouth-theme files
-                sudo cp -r tux-plymouth-theme/* $plymouth_dir/themes/tux-plymouth-theme;
-                
-                # 4) Copy the internals of our files to existing using xclip
-                sudo xclip $plymouth_dir/themes/tux-plymouth-theme/tux.script;
-                sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.script';
-                xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.script;
-                sudo xclip $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
-                sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.plymouth';
-                xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.plymouth;                          
-                
-                # 5) Remove our own files
-                sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
-                sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.script;
-                
-                # 6) And rename the newly created copies
-                sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.script $plymouth_dir/themes/tux-plymouth-theme/tux.script
-                sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth
+                    # 2) Copy one of these themes, the theme called script.
+                    sudo cp -r $plymouth_dir/themes/script $plymouth_dir/themes/tux-plymouth-theme;  
+                    
+                    # 3) Add tux-plymouth-theme files
+                    sudo cp -r tux-plymouth-theme/* $plymouth_dir/themes/tux-plymouth-theme;
+                    
+                    # 4) Copy the internals of our files to existing using xclip
+                    sudo xclip $plymouth_dir/themes/tux-plymouth-theme/tux.script;
+                    sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.script';
+                    xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.script;
+                    sudo xclip $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
+                    sudo bash -c '> '$plymouth_dir'/themes/tux-plymouth-theme/script.plymouth';
+                    xclip -out | sudo tee -a $plymouth_dir/themes/tux-plymouth-theme/script.plymouth;                          
+                    
+                    # 5) Remove our own files
+                    sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth;
+                    sudo rm $plymouth_dir/themes/tux-plymouth-theme/tux.script;
+                    
+                    # 6) And rename the newly created copies
+                    sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.script $plymouth_dir/themes/tux-plymouth-theme/tux.script
+                    sudo mv $plymouth_dir/themes/tux-plymouth-theme/script.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth
+                else
+                    sudo cp -r tux-plymouth-theme $plymouth_dir/themes/
+                fi
 
                 # Then we can add it to default.plymouth and update update-initramfs accordingly
                 sudo update-alternatives --install $plymouth_dir/themes/default.plymouth default.plymouth $plymouth_dir/themes/tux-plymouth-theme/tux.plymouth 100;
@@ -279,14 +287,15 @@ function change_desktop {
                 echo "Installing packages..."
                 check_sudo
                 # Check if ppa's exists, otherwise add them
-
-                echo "/etc/apt/sources.list.d/arc-theme.list not found, adding it now."
-                sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
-                arc_ppa_added=true
-                echo "arc-theme's Release.key is being installed to get secure downloads and updates"
-                arc_temp_dir=$(mktemp -d)
-                wget -O $arc_temp_dir/Release.key http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
-                sudo apt-key add - < $arc_temp_dir/Release.key
+                if [[ OS_VERSION == "16.04" ]]; then
+                    echo "/etc/apt/sources.list.d/arc-theme.list not found, adding it now."
+                    sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /' >> /etc/apt/sources.list.d/arc-theme.list"
+                    arc_ppa_added=true
+                    echo "arc-theme's Release.key is being installed to get secure downloads and updates"
+                    arc_temp_dir=$(mktemp -d)
+                    wget -O $arc_temp_dir/Release.key http://download.opensuse.org/repositories/home:Horst3180/xUbuntu_16.04/Release.key
+                    sudo apt-key add - < $arc_temp_dir/Release.key
+                fi
                 sudo add-apt-repository ppa:snwh/pulp
                 # Update apt-get
                 echo "Tux will now update your apt-get lists before install (which may take a while)."
