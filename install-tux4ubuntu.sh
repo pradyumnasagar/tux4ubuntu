@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+# 
 # install-ubuntu.sh - Tux4Ubuntu Installer
 #                                                   
 # Copyright (C) 2016 Tux4Ubuntu Initiative <http://tux4ubuntu.blogspot.com>
